@@ -47,6 +47,7 @@ public class Frame extends JFrame implements MouseInputListener
 	JScrollPane scrollPaneRight;
 	
 	private static final int graphPanelWidth=850;
+	private static final int navigationPanelHeight=50;
 	private static final int BottomPanelHeight=600;
 	private static final int statPanelWidth=200;
 	private static final int topPanelHeight=50;
@@ -152,7 +153,7 @@ public class Frame extends JFrame implements MouseInputListener
 		//frame.add(panelStat,gbc);
 		
 		frame.add(scrollPaneRight,gbc);
-		navigationPanel= new BackForth();
+		navigationPanel= new BackForth(new GridBagLayout(),statPanelWidth,navigationPanelHeight);
 		
 		gbc.gridx=1;
 		gbc.gridy=0;
@@ -207,45 +208,45 @@ public class Frame extends JFrame implements MouseInputListener
 		// TODO Auto-generated method stub
 		if(e.getSource()==statPanel)
 		{
-			System.out.println("Stat Panel");
+			//System.out.println("Stat Panel");
 			numClicks=navigationPanel.getNumClicks();
 
 			System.out.println("Num CLick: "+numClicks);
 		}
 		if(e.getSource()==scrollPaneRight)
 		{
-			System.out.println("Scroll Panel Right");
+			//System.out.println("Scroll Panel Right");
 
 		}
 		if(e.getSource()==scrollPaneLeft)
 		{
-			System.out.println("Scroll Panel Left");
+			//System.out.println("Scroll Panel Left");
 
 		}
 		if(e.getSource()==navigationPanel)
 		{
-			System.out.println("Navigation Panel");
-			System.out.println(navigationPanel.getLeft());
-			System.out.println(navigationPanel.getTouch());
+			//System.out.println("Navigation Panel");
+			//System.out.println(navigationPanel.getLeft());
+			//System.out.println(navigationPanel.getTouch());
 			numClicks=navigationPanel.getNumClicks();
-			System.out.println("Num CLick: "+numClicks);
+			//System.out.println("Num CLick: "+numClicks);
 
 			if(numClicks>0)
 			{
-			System.out.println("Recalibrating");
+			//System.out.println("Recalibrating");
 			}
 
 		}
 		if(e.getSource()==graphPanel)
 		{
-			System.out.println("Graph Panel");
+			//System.out.println("Graph Panel");
 			if(graphPanel.getDateEnter()==true)
 			{
 				navigationPanel.setDate(graphPanel.getBeginDate());
 				dateBegin=graphPanel.getBeginDate(); //This is your begin Date
 				dateEnd=graphPanel.getEndDate();
 				numClicks=navigationPanel.getNumClicks();
-				System.out.println("Num CLick: "+numClicks);
+			//	System.out.println("Num CLick: "+numClicks);
 
 				graphPanel.setDate(setDate());
 				
@@ -387,20 +388,20 @@ public class Frame extends JFrame implements MouseInputListener
 		// TODO Auto-generated method stub
 		if(e.getSource()==statPanel)
 		{
-			System.out.println("Stat Panel");
+		//	System.out.println("Stat Panel");
 		}
 		if(e.getSource()==scrollPaneRight)
 		{
-			System.out.println("Scroll Panel Right");
+		//	System.out.println("Scroll Panel Right");
 
 		}
 		if(e.getSource()==graphPanel)
 		{
-			System.out.println("Graph Panel");
+		//	System.out.println("Graph Panel");
 		}
 		if(e.getSource()==navigationPanel)
 		{
-			System.out.println("Navigation Panel");
+		//	System.out.println("Navigation Panel");
 			numClicks=navigationPanel.getNumClicks();
 
 			//System.out.println(navigationPanel.getLeft());
@@ -409,7 +410,7 @@ public class Frame extends JFrame implements MouseInputListener
 		}
 		if(numClicks>0)
 		{
-		System.out.println("Recalibrating");
+		//System.out.println("Recalibrating");
 		}
 	}
 

@@ -16,15 +16,46 @@ public class BackForth extends JPanel
 	private ImageIcon leftArrow;
 	private ImageIcon rightArrow;
 	//private ImageIcon rightArrow;
+	//These are the sets of Buttons
+	
 	private JButton buttonLeft;
 	private JButton buttonRight;
+	private JButton QPulseButton;
+	private JButton CoreMSButton;
+	private JButton GasTempButton;
+	private JButton ExcessPowerButton;
+	
+	private boolean QPulse;
+	private boolean CoreMS;
+	private boolean GasTemp;
+	private boolean ExcessPower;
+	
 	private JLabel label;
 	private static int monthsWith30Days[]={4,6,9,11};
 	private static int monthsWith31Days[]={1,3,5,7,8,10,12};
 	private static int monthWith1Month=2;
 	
 	private Graph panel;
-	
+	/*
+	 * |------------------------------------------|
+	 * |	Date 	  	  |/  |___   ___ |\        |	
+	 * |	JLabel	  	  |\	  | |     /        |	
+	 * |			  	  | \|---   === |/         |	
+	 * |--------------|------------------------   |	
+	 * |======--||--------||--------||------------||								  |	
+	 * |QPulse  || Core MS||Gas Temp|| Excess POW ||	
+	 * |        ||        ||        ||            ||	
+	 * |		||		  ||		||			   |	
+	 * |------------------------------------------|
+	 * |
+	 * |
+	 * |
+	 * |
+	 * |
+	 * |
+	 * |
+
+	 */
 	private boolean left=false;
 	private boolean buttonTouched=false;
 	BackForth()
@@ -85,18 +116,190 @@ public class BackForth extends JPanel
 				//Decrease Date
 			}});
 	}
-	BackForth(LayoutManager layout)
+	BackForth(LayoutManager layout, int PanelWidth, int PanelHeight)
 	{
+		/*|------------------------------------------|
+		 * |	Date 	  	  |/  |___   ___ |\        |	
+		 * |	JLabel	  	  |\	  | |     /        |	
+		 * |			  	  | \|---   === |/         |	
+		 * |--------------|------------------------   |	
+		 * |====|==--||---|-----||----|----||------|------||								  |	
+		 * |QPulse  || Core MS||Gas Temp|| Excess POW ||	
+		 * |    |    ||    |    ||  |      ||    |   ||	
+		 * |	|	||	   |  ||	|	||		 |   ||	
+		 * |------------------------------------------|
+		*/
 		super(layout);
-		xLengthPanel=110;
-		yLengthPanel=40;
+		GridBagConstraints gbc= new GridBagConstraints();
+		xLengthPanel=PanelWidth;
+		yLengthPanel=PanelHeight;
 		//panelBackForth= new BackForth();
 		//panelBackForth.setLayout(new FlowLayout());
 		setSize(xLengthPanel, yLengthPanel);
+		setSize(xLengthPanel, yLengthPanel);
+		setBackground(Color.WHITE);
+		leftArrow= new ImageIcon(("data/LA.png"));
+		rightArrow= new ImageIcon(("data/RA.png"));
+		QPulseButton= new JButton("Q Pulse Heat Diff");
+		CoreMSButton= new JButton("Core MS");
+		GasTempButton= new JButton("Gas Temp");
+		ExcessPowerButton= new JButton("Excess Pow");
+		label= new JLabel("Date: ");
+		buttonLeft= new JButton("",leftArrow);
+		buttonRight=new JButton("",rightArrow);
+		
+		QPulse=false;
+		CoreMS=false;
+		GasTemp=false;
+		ExcessPower=false;
+		
+		gbc.gridwidth=4;
+		gbc.gridx=0;
+		gbc.gridy=0;
+		gbc.weightx=0.5;
+		gbc.fill=GridBagConstraints.HORIZONTAL;
+		add(label,gbc);
+		
+		gbc.gridwidth=1;
+		gbc.gridx=2;
+		gbc.gridy=0;
+		gbc.weightx=0.5;
+		add(buttonLeft,gbc);
+		//add(buttonRight,gbc);
+		
+		gbc.gridwidth=1;
+		gbc.gridx=3;
+		gbc.gridy=0;
+		gbc.weightx=0.5;
+		add(buttonRight,gbc);
+		
+		gbc.gridwidth=2;
+		gbc.gridx=4;
+		gbc.gridy=0;
+		gbc.weightx=0.5;
+		add(QPulseButton,gbc);
+		
+		gbc.gridwidth=2;
+		gbc.gridx=0;
+		gbc.gridy=1;
+		gbc.weightx=0.5;
+		add(CoreMSButton,gbc);
+		
+		gbc.gridwidth=2;
+		gbc.gridx=2;
+		gbc.gridy=1;
+		gbc.weightx=0.5;
+		add(GasTempButton,gbc);
+		
+		gbc.gridwidth=2;
+		gbc.gridx=4;
+		gbc.gridy=1;
+		gbc.weightx=0.5;
+		add(ExcessPowerButton,gbc);
+		
+		//labelArrow= new JLabel(Arrow);
+		//add(new JLabel(new ImageIcon("data/Arrows.png")));
+		QPulseButton.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("Excess Power");
+				ExcessPower=false;
+				CoreMS=false;
+				QPulse=true;
+				GasTemp=false;
+				//(boolean QPulse, boolean CoreMS,boolean gasTemps, boolean ExcessPower)
+				panel.setGraphType(QPulse,CoreMS,GasTemp,ExcessPower);
+				panel.repaint();
+				System.out.println("Repainting");
+				//Increase Date
+			}});
+		
+		CoreMSButton.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("Excess Power");
+				ExcessPower=false;
+				CoreMS=true;
+				QPulse=false;
+				GasTemp=false;
+				panel.setGraphType(QPulse,CoreMS,GasTemp,ExcessPower);
+				panel.repaint();
+
+				System.out.println("Repainting");
+				//Increase Date
+			}});
+		
+		GasTempButton.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("Excess Power");
+				ExcessPower=false;
+				CoreMS=false;
+				QPulse=false;
+				GasTemp=true;
+				panel.setGraphType(QPulse,CoreMS,GasTemp,ExcessPower);
+
+				panel.repaint();
+				System.out.println("Repainting");
+				//Increase Date
+			}});
+		
+		ExcessPowerButton.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("Excess Power");
+				ExcessPower=true;
+				CoreMS=false;
+				QPulse=false;
+				GasTemp=false;
+				panel.setGraphType(QPulse,CoreMS,GasTemp,ExcessPower);
+				panel.repaint();
+				System.out.println("Repainting");
+				//Increase Date
+			}});
+		buttonRight.addActionListener(new ActionListener(){
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			left=false;
+			buttonTouched=true;
+			System.out.println("Button Right");
+			numClicks++;
+			System.out.println("Num Clicks increasing to :" + numClicks);
+			incrementDate();
+			panel.setDate(date);
+			System.out.println("Date is "+date );
+			panel.repaint();
+			System.out.println("Repainting");
+			setDate();
+			//Increase Date
+		}});
+		buttonLeft.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				left=true;
+				buttonTouched=true;
+				numClicks=numClicks-1;
+				System.out.println("Button Left");
+				System.out.println("Num Clicks decrease=ing to :" + numClicks);
+				
+				decrementDate();
+				panel.setDate(date);
+				System.out.println("Date is "+date );
+				panel.repaint();
+				System.out.println("Repainting");
+
+				setDate();
+				//Decrease Date
+			}});
 		
 		//Arrow= new ImageIcon(getClass().getResource("data/Arrows.png"));
 		//labelArrow= new JLabel(Arrow);
-		add(new JLabel(new ImageIcon("data/Arrows.png")));		
 	}
 	
 	public void setDate(String date)

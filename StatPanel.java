@@ -73,13 +73,13 @@ public class StatPanel extends JPanel
 		String step1=" Electrical Loss: "+ElectricalLoss;
 		g.setColor(Color.RED);
 		setBackground(Color.WHITE);
-		System.out.println("Paint 1");
+		//System.out.println("Paint 1");
 		//g.drawString(step1, Margin, increment+50);
 		g.drawString("At the Bottom To IMplement Scroll", Margin, 700);
 		//This is where you draw step2and3
 		if(table!=null)
 		{
-			System.out.println("Painting 2 and 3");
+			//System.out.println("Painting 2 and 3");
 			 draw= new Point(Margin,increment+70);
 
 			//paintStep2and3(g,draw);

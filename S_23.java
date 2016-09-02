@@ -16,7 +16,11 @@ public class S_23
 	
 	S_23(String index, double LOther, ArrayList<Double> QPow, ArrayList<Double> LCoolant, double pulseParam, GasLoss gLoss, ArrayList<Double> HeaterPow, ArrayList<Double> tempDiff, ArrayList<Double> LPM, boolean helium, int Temperature)
 	{
-		 
+		System.out.println("Index: "+index);
+		String holder[];
+		holder=index.split("---");
+        this.beginIndex=(Integer.parseInt(holder[0]));
+        this.endIndex=Math.abs((Integer.parseInt(holder[1])));	
 		this.helium=helium;
 		this.LOther=LOther;
 		this.pulseParam=pulseParam;
@@ -26,37 +30,39 @@ public class S_23
 		double sum2=0;
 		double temp=0;
 		double tempHolder=0;
-		String holder[];
 		PulsePower= new ArrayList<>();
 		JacketLoss= new ArrayList<>();
 		//This is for error checking
 		if(QPow.size()!=LCoolant.size())
 		{
-			System.out.println("There is a fucking error.  The QPow and Lcoolant Arrays are the same size");
+			System.out.println("There is a  error.  The QPow and Lcoolant Arrays are the same size");
 		}
 		
 		
 		//Here I want to take in the arrayList and initialize the step2Calc
+		//System.out.println(beginIndex+" QPow : "+QPow.get(0)+" LCoolant: "+LCoolant.get(0)+" LOther:" +this.LOther);
+		//System.out.println(endIndex+" QPow : "+QPow.get(QPow.size()-1)+" LCoolant: "+LCoolant.get(QPow.size()-1)+" LOther:" +this.LOther);
+
 		for(int i=0;i<QPow.size();i++)
 		{
 			//Lets skip the first 50 for step2 calc and step 3
 			temp=QPow.get(i)-LCoolant.get(i)-this.LOther;
-			System.out.println(i+"QPow : "+QPow.get(i)+" LCoolant: "+LCoolant.get(i)+" LOther:" +this.LOther);
+			//System.out.println(beginIndex+i+" QPow : "+QPow.get(i)+" LCoolant: "+LCoolant.get(i)+" LOther:" +this.LOther);
 			tempHolder= HeaterPow.get(i)+ temp- gLoss.get(i);
-			if(i>50)
-			{
+			
 			sum+=temp;
 			sum2+=tempHolder;
-			}
+			
 			PulsePower.add(temp);
 			JacketLoss.add(tempHolder);
 		}
-		meanPulse=sum/(QPow.size()-50);
-		meanJacket=sum2/(QPow.size()-50);
+		meanPulse=sum/(QPow.size());
+		meanJacket=sum2/(QPow.size());
+		System.out.println("Mean Pulse: "+meanPulse);
+		System.out.println("Mean Jacket: "+meanJacket);
+
 		// Now I want to break up the String index into begin and end
-		holder=index.split("---");
-        this.beginIndex=(Integer.parseInt(holder[0]));
-        this.endIndex=Math.abs((Integer.parseInt(holder[1])));	
+		
 	}
 	public double getPulseParam()
 	{

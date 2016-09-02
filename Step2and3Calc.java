@@ -52,7 +52,6 @@ public class Step2and3Calc
 		//So basically what I want this to do is to scan the arrayList to see if there are any matching parameters
 		
 		// Core Gas Helium and Hydrogen Mapped Density
-	//	System.out.println("Shitter");
 		// So you don't really need to organize the arraylist in order
 		boolean found=false;
 		int meanJacketTemp=0;

@@ -28,7 +28,10 @@ public class Graph extends JPanel
 	private Step1Calculation step1Calibration;
 	private static Stack<Step2and3Calc> Step2and3CalcGRAPHStack;
 
-	
+	private boolean QPulse=true;
+	private boolean CoreMS=false;
+	private boolean GasTemp=false;
+	private boolean ExcessPower=false;
 	
 	
 	private static Stack<Step1Calculation> Step1LongCalcStack;
@@ -326,6 +329,15 @@ public class Graph extends JPanel
 	{
 		return table23;
 	}
+	public void setGraphType(boolean QPulse, boolean CoreMS,boolean gasTemps, boolean ExcessPower)
+	{
+		this.QPulse=QPulse;
+		this.CoreMS=CoreMS;
+		this.GasTemp=gasTemps;
+		this.ExcessPower=ExcessPower;
+
+		
+	}
 
 	public void dateAnalysis() throws Exception
 	{
@@ -586,7 +598,16 @@ public class Graph extends JPanel
 		g.drawLine(origin.getX(),origin.getY(),yTopAxis.getX(),yTopAxis.getY());
 		g.drawLine(origin.getX(),origin.getY(),xBottomAxis.getX(),xBottomAxis.getY());
 		String fileName= "data/"+date+".csv";
-		initializeColoredPoints(fileName,true, false, false, false,origin, xBottomAxis,null);
+		initializeColoredPoints(fileName,QPulse, ExcessPower, CoreMS, GasTemp,origin, xBottomAxis,null);
+		/*
+		 * 
+	private boolean QPulse;
+	private boolean CoreMS;
+	private boolean GasTemp;
+	private boolean ExcessPower;
+		 */
+		//	public void initializeColoredPoints(String date,boolean HeaterQPulse, boolean ExcessPower, boolean CoreMS, boolean gasTemps, Point origin, Point xBottomAxis, Step1Calculation past)
+
 		drawPoints(g,origin,yTopAxis,xBottomAxis);
 		drawScale(g,origin,xBottomAxis,yTopAxis);
 		statPanel.updateInformation(electricalLoss, table23);
@@ -744,7 +765,7 @@ public class Graph extends JPanel
 	
 	
 
-	public void initializeColoredPoints(String date,boolean HeaterQPulse, boolean calor, boolean CoreMS, boolean gasTemps, Point origin, Point xBottomAxis, Step1Calculation past)
+	public void initializeColoredPoints(String date,boolean HeaterQPulse, boolean ExcessPower, boolean CoreMS, boolean gasTemps, Point origin, Point xBottomAxis, Step1Calculation past)
 	{
 		LENRCSVParser parse= new LENRCSVParser(date,step0);
 		if(pointToPlot.size()>0)
@@ -758,8 +779,14 @@ public class Graph extends JPanel
 		{
 			InitializeHeatDiffandQPiPoints(parse);	
 		}
-		
-		
+		if(CoreMS==true)
+		{
+			InitializeCoreMS( parse);
+		}
+		if(gasTemps)
+		{
+			InitializeGasTemp(parse);
+		}
 		
 		
 		
@@ -858,6 +885,169 @@ public class Graph extends JPanel
 		System.out.println("Range Max: "+RangeMax);
 		pointToPlot.add(heatColoredPoint);
 		pointToPlot.add(piThermColoredPoint);
+
+	}
+	public void InitializeCoreMS(LENRCSVParser parse)
+	{
+		ArrayList<Double> hydrogen;
+		ArrayList<Double> argon;
+		ArrayList<Double> helium;
+		double tempRangeMax=0;
+		hydrogen=parse.getHydrogenCoreOutGas(GraphPanelWidth);
+		helium=parse.getHeliumCoreGas(GraphPanelWidth);
+		argon=parse.getArgonCoreOutGas(GraphPanelWidth);
+		Color hydrogenColor= Color.RED;
+		Color heliumColor= Color.BLUE;
+		Color argonColor=Color.YELLOW;
+		
+		step1Points= new ArrayList<>();
+		ColoredPoint hydrogenTemp;
+		ColoredPoint argonTemp;
+		ColoredPoint heliumTemp;
+		
+		LinkedList<ColoredPoint> hydrogenColoredPoint= new LinkedList<>();
+		LinkedList<ColoredPoint> argonColoredPoint= new LinkedList<>();
+		LinkedList<ColoredPoint> heliumColoredPoint= new LinkedList<>();
+		//	ColoredPoint(Color color, int xComp, int yComp, String xLabel, String yLabel)
+		domainMax=hydrogen.size();
+		System.out.println("Domain MAX: "+domainMax);
+		if(hydrogen.get(0)>helium.get(0) && hydrogen.get(0)>argon.get(0))
+		{
+			tempRangeMax=hydrogen.get(0);
+		}
+		for(int i=0;i<hydrogen.size();i++)
+		{
+					if( hydrogen.get(i)> tempRangeMax)
+					{
+						tempRangeMax=hydrogen.get(i);
+					}
+					if( helium.get(i)> tempRangeMax)
+					{
+						tempRangeMax=helium.get(i);
+					}
+					if( argon.get(i)> tempRangeMax)
+					{
+						tempRangeMax=argon.get(i);
+					}
+					hydrogenTemp= new ColoredPoint(hydrogenColor, i, hydrogen.get(i), "Index", "Watt");
+					argonTemp= new ColoredPoint(argonColor, i, argon.get(i), "Index", "Watt");
+					heliumTemp= new ColoredPoint(heliumColor,i,helium.get(i),"Index","Watt");
+					
+			
+		
+					hydrogenColoredPoint.add(hydrogenTemp);
+					argonColoredPoint.add(argonTemp);
+					heliumColoredPoint.add(heliumTemp);
+			//System.out.println("Adding to LL: Blue");
+		
+		}
+		//System.out.println("Heat Colored Point Size: "+heatColoredPoint.size());
+		//System.out.println("Pi Therm Size: "+piThermColoredPoint.size());
+		RangeMax=(int)tempRangeMax;
+		System.out.println("Range Max: "+RangeMax);
+		pointToPlot.add(hydrogenColoredPoint);
+		pointToPlot.add(argonColoredPoint);
+		pointToPlot.add(heliumColoredPoint);
+	}
+	
+	public void InitializeGasTemp(LENRCSVParser parse)
+	{
+		ArrayList<Double> CoreInTemp;
+		ArrayList<Double> CoreOutTemp;
+		ArrayList<Double> CoreReactorTemp;
+		ArrayList<Double> JacketOutTemp;
+		ArrayList<Double> JacketInTemp;
+
+		double tempRangeMax=0;
+		CoreInTemp=parse.getCoreInTemperature(GraphPanelWidth);
+		CoreOutTemp=parse.getCoreOutTemperature(GraphPanelWidth);
+		CoreReactorTemp=parse.getCoreReactorTemperature(GraphPanelWidth);
+		JacketOutTemp=parse.getJacketOutTemperature(GraphPanelWidth);
+		JacketInTemp=parse.getJacketInTemperature(GraphPanelWidth);
+		
+		Color CoreInColor= Color.YELLOW;
+		Color CoreOutColor= Color.RED;
+		Color CoreReactorColor=Color.ORANGE;
+		Color JacketInColor= Color.MAGENTA;
+		Color JacketOutColor= Color.BLUE;
+		Color piThermColor= Color.BLUE;
+		
+		ColoredPoint CoreInTempHold;
+		ColoredPoint CoreOutTempHold;
+		ColoredPoint CoreReactorTempHold;
+		ColoredPoint JacketInTempHold;
+		ColoredPoint JacketOutTempHold;
+
+		
+		LinkedList<ColoredPoint> CoreInTemperature= new LinkedList<>();
+		LinkedList<ColoredPoint> CoreOutTemperature= new LinkedList<>();
+		LinkedList<ColoredPoint> CoreReactorTemperature= new LinkedList<>();
+		LinkedList<ColoredPoint> JacketInTemperature= new LinkedList<>();
+		LinkedList<ColoredPoint> JacketOutTemperature= new LinkedList<>();
+
+
+		LinkedList<ColoredPoint> piThermColoredPoint= new LinkedList<>();
+		//	ColoredPoint(Color color, int xComp, int yComp, String xLabel, String yLabel)
+		domainMax=CoreInTemp.size();
+		System.out.println("Domain MAX: "+domainMax);
+		if(CoreInTemp.get(0)>CoreReactorTemp.get(0))
+		{
+			tempRangeMax=CoreInTemp.get(0);
+		}
+		for(int i=0;i<CoreInTemp.size();i++)
+		{
+					if( CoreInTemp.get(i)> tempRangeMax)
+					{
+						tempRangeMax=CoreInTemp.get(i);
+					}
+					if( CoreOutTemp.get(i)> tempRangeMax)
+					{
+						tempRangeMax=CoreOutTemp.get(i);
+					}
+					if( CoreReactorTemp.get(i)> tempRangeMax)
+					{
+						tempRangeMax=CoreReactorTemp.get(i);
+					}
+					if( JacketOutTemp.get(i)> tempRangeMax)
+					{
+						tempRangeMax=JacketOutTemp.get(i);
+					}
+					if( JacketInTemp.get(i)> tempRangeMax)
+					{
+						tempRangeMax=JacketInTemp.get(i);
+					}
+					CoreInTempHold= new ColoredPoint(CoreInColor, i,CoreInTemp.get(i), "Index", "Degree");
+					CoreOutTempHold= new ColoredPoint(CoreOutColor, i,CoreOutTemp.get(i), "Index", "Degree");
+					CoreReactorTempHold= new ColoredPoint(CoreReactorColor, i,CoreOutTemp.get(i), "Index", "Degree");
+					JacketInTempHold= new ColoredPoint(JacketInColor, i,JacketInTemp.get(i), "Index", "Degree");
+					JacketOutTempHold= new ColoredPoint(JacketOutColor, i,JacketOutTemp.get(i), "Index", "Degree");
+
+					CoreInTemperature.add(CoreInTempHold);
+					CoreOutTemperature.add(CoreOutTempHold);
+					CoreReactorTemperature.add(CoreReactorTempHold);
+					JacketInTemperature.add(JacketInTempHold);
+					JacketOutTemperature.add(JacketOutTempHold);
+					
+
+					
+				//	piThermTemp= new ColoredPoint(piThermColor, i, piTherm.get(i), "Index", "Degree");
+			//heatColoredPoint.add(heatTemp);
+			//System.out.println("Adding to LL: Green");
+			//piThermColoredPoint.add(piThermTemp);
+			//System.out.println("Adding to LL: Blue");
+		
+		}
+		//System.out.println("Heat Colored Point Size: "+heatColoredPoint.size());
+		//System.out.println("Pi Therm Size: "+piThermColoredPoint.size());
+		RangeMax=(int)tempRangeMax;
+		System.out.println("Range Max: "+RangeMax);
+		pointToPlot.add(CoreInTemperature);
+		pointToPlot.add(CoreOutTemperature);
+		pointToPlot.add(CoreReactorTemperature);
+		pointToPlot.add(JacketInTemperature);
+		pointToPlot.add(JacketOutTemperature);
+
+
 
 	}
 	

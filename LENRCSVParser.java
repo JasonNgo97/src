@@ -29,10 +29,10 @@ public class LENRCSVParser
     //This is the total Data Members
 
     static private ArrayList<String> time;
-    static private ArrayList<Double> JacketOutGas;
+    static private ArrayList<Double> JacketOutGas;//Temperature
     static private ArrayList<Double> JacketPressure;
     static private ArrayList<Double> H2MakeUpLPM;
-    static private ArrayList<Double> JacketInGas;
+    static private ArrayList<Double> JacketInGas;//Temperature
     static private ArrayList<Double> JackDiffTemp;
     static private ArrayList<Double> ThermH2oOut;
     static private ArrayList<Double> ThermH2oIn;
@@ -768,17 +768,17 @@ public class LENRCSVParser
             {
                 //System.out.println("*****Step 1 Initialized*******");
                 //This tells you that the sequence has begun
-            //	System.out.println("Heat Diff: "+HeatDiff.get(i));
-                pulseParam=QPulseWidth.get(i);
+               //	System.out.println("Heat Diff: "+HeatDiff.get(i));
+                //pulseParam=QPulseWidth.get(i);
                 begin=true;
                 beginIndex=i;
                 begintime= time.get(beginIndex);
                 foundStep1=true;
-                System.out.println("Pulse Param: "+pulseParam);
-                System.out.println("Begin Time: "+begintime);
-                System.out.println(" P_pitherm: "+P_pitherm.get(i));
-                System.out.println(" HeatDiff: "+HeatDiff.get(i));
-                System.out.println(" HeatDiff +10: "+HeatDiff.get(i+10));
+               // System.out.println("Pulse Param: "+pulseParam);
+                //System.out.println("Begin Time: "+begintime+" Begin Index: "+beginIndex);
+                //System.out.println(" P_pitherm: "+P_pitherm.get(i));
+                //System.out.println(" HeatDiff: "+HeatDiff.get(i));
+                //System.out.println(" HeatDiff +10: "+HeatDiff.get(i+10));
                 if(numCalTimes==0)
                 {
                     beginIndexInitial=i;
@@ -788,42 +788,35 @@ public class LENRCSVParser
                 numCalTimes+=1;
             }
             // Changing Pulse Parm
-            if(P_pitherm.get(i)>2 && HeatDiff.get(i)<1
-                    && HeatDiff.get(i+20)<1 && QPulseWidth.get(i)!= pulseParam && begin==true) //This tells you that the sequence has begin
-            {
-                //System.out.println("------Step 1 Finished------");
-                //This tells you that the sequence has begun
-                pulseParam=QPulseWidth.get(i);// Reinitialize the pulse Param
-                begin=false;
-                endIndex=i-1;
-                endtime= time.get(endIndex);
-                holder= begintime+"---"+endtime;
-                indexHolder=beginIndex+"---"+ endIndex;
-                //System.out.println(" Time Interval: "+holder);
-                //System.out.println(" Index: "+beginIndex+ " ----- " +endIndex);
-                // Start a new sequence
-                Step1Short.add(indexHolder);
-                Step1ShortTime.add(holder);
-
-                //System.out.println("*****Step 1 ReInitialized*******");
-                //System.out.println("Pulse Param: "+pulseParam);
-                beginIndex=i;
-                begintime=time.get(i);
-                //System.out.println("Begin Time: "+begintime);
-                begin=true;
-            }
+          
 
             if(P_pitherm.get(i)<0.5  && HeatDiff.get(i)<1 && begin==true )
             {
                 endIndexFinal=i;
+                int endIndexTemp;
+                endIndexTemp=endIndex;
                 endIndex=i;
                 endtime= time.get(endIndexFinal);
 
                 //System.out.println("*****Step 1 is completely done********");
-                System.out.println("End Time is "+endtime);
-                System.out.println(" Ppitherm: "+P_pitherm.get(i));
-                System.out.println(" Heat Diff: "+HeatDiff.get(i));
-                holder=beginIndex+"----"+endIndex;
+                //System.out.println("End Time is "+endtime+" End Index: "+endIndex);
+               // System.out.println(" Ppitherm: "+P_pitherm.get(i));
+                //System.out.println(" Heat Diff: "+HeatDiff.get(i));
+                if(endIndex-beginIndex<20)
+                {
+                	System.out.println("Interval is too small to add");
+                	endIndex=endIndexTemp;
+                	   begintime= new String();
+                       endtime= new String();
+                       beginIndex=0;
+                       endIndex=0;
+                       pulseParam=0;
+                       begin=false;
+                }
+                else
+                {
+                	
+                 holder=beginIndex+"----"+endIndex;
                 Step1Short.add(holder);
                 holder2=begintime+"----"+endtime;
 
@@ -838,8 +831,10 @@ public class LENRCSVParser
                 //System.out.println("Interval: "+ interval);
                 indexHolder= beginIndexInitial+"----"+endIndexFinal;
                 interval+= " ||  Total Index: " +indexHolder;
+                
                 Step1Long.add(interval);
                 Step1LongIndex.add(indexHolder);
+                }
 
                 //System.out.println("Index: "+indexHolder);
                 //System.out.println(" Time Interval: "+ interval);
@@ -906,22 +901,22 @@ public class LENRCSVParser
                         pulseParam=QPulseWidth.get(i);
                         temp=CoreInTemp.get(i);
                         found2=true;
-                        //System.out.println("*****Step 2 Beginning*******");
-                        //System.out.println("Begin Time: "+beginTimeInitial);
-                        //System.out.println(" Pulse Param: "+pulseParam);
+                        System.out.println("*****Step 2 Beginning*******");
+                        System.out.println("Begin Time: "+beginTimeInitial);
+                        System.out.println(" Pulse Param: "+pulseParam);
                         numCalTimes++;
                     }
                     if((QPulseWidth.get(i)!=pulseParam && numCalTimes>0) ||  (CoreInTemp.get(i)>(temp+10)&& numCalTimes>0) || (CoreInTemp.get(i)<(temp-10) && numCalTimes>0))
                     {
                         endIndex=i-1;
                         endTime=time.get(i);
-                        //System.out.println("----Step 2 Ended with Pulse Param: "+ pulseParam);
+                        System.out.println("----Step 2 Ended with Pulse Param: "+ pulseParam);
                         holderTime= beginTime+ " ---- "+ endTime;
                         holderIndex= beginIndex+ "----"+endIndex;
                         Step2Short.add(holderIndex);
                         Step2ShortTime.add(holderTime);
-                        //System.out.println(" Time: "+holderTime);
-                        //System.out.println(" Index: "+holderIndex);
+                        System.out.println(" Time: "+holderTime);
+                        System.out.println(" Index: "+holderIndex);
                         //System.out.println("*****----Step 2 Initializing------******");
                         beginIndex=i;
                         beginTime=time.get(i);
@@ -933,7 +928,7 @@ public class LENRCSVParser
                 if(P_pitherm.get(i)<1  && HeatDiff.get(i)<1 && begin==true )
                 {
 
-                    //System.out.println("*******Step 2*******DONE*****************");
+                    System.out.println("*******Step 2*******DONE*****************");
                     end=true;
                     endFinalIndex=i;
                     endIndex=i;
@@ -947,8 +942,8 @@ public class LENRCSVParser
 
                 begin=false;
                 holderTime= "Time: "+beginTimeInitial+"------"+endTimeFinal;
-                //System.out.println("----------------------------------------------------------------------"
-                    //+ "-----------------------");
+                System.out.println("----------------------------------------------------------------------"
+                   + "-----------------------");
                 //System.out.println("Interval: "+ interval);
                 holderIndex= beginInitialIndex+"----"+endFinalIndex;
                 holderTime+=" ||  Index: " +holderIndex;
@@ -995,14 +990,15 @@ public class LENRCSVParser
             temp=new Step1Calculation(Step1Short.get(i),date1);
             
         //        System.out.println("\t"+"("+i+")");
-            System.out.println("Calculating Step 1 for "+temp.getIndex());
+            System.out.println(i+") Calculating Step 1 for "+temp.getIndex());
+            System.out.println("QPow :"+QPow.get(beginIndex)+ " LCoolant : "+LCoolant.get(beginIndex));
             for(int j=beginIndex;j<endIndex;j++)
             {
                 temp.PiMinusLCool(QPow.get(j),LCoolant.get(j));
             }
             temp.CalculateMean();
-          //  System.out.println(" Mean: "+temp.getMean());
-           // System.out.println("Max : "+ temp.getMax());
+           System.out.println(" Mean: "+temp.getMean());
+           System.out.println("Max : "+ temp.getMax());
             //System.out.println("Max Index: "+ temp.getMaxIndex());
             Step1Calc.push(temp);
        //     System.out.println("Pushing");
@@ -1754,8 +1750,112 @@ public class LENRCSVParser
     	    	return concatPiTherm;
     	
     }
-
-
+    public ArrayList<Double> getCoreOutTemperature(int screenDomain)
+    {
+    	double temp;
+    	int konstant;
+    	//System.out.println("Getting HeatDiff");
+    	//System.out.println("Screen Domain: "+screenDomain);
+    	//System.out.println("P_pitherm Size: "+P_pitherm.size());
+    	temp=screenDomain/P_pitherm.size();  
+    	//System.out.println(" Amount: "+P_pitherm.size()/screenDomain);
+    //	System.out.println("Temp: "+temp);
+    	
+       	konstant=(int)P_pitherm.size()/screenDomain;
+    	//System.out.println("Konstant: "+konstant);
+    	ArrayList<Double> concatPiTherm= new ArrayList<>();
+    	for(int i=0;i<HeatDiff.size();i=i+konstant)
+    	{
+    		concatPiTherm.add(CoreOutTemp.get(i));
+    	}
+    	    	return concatPiTherm;
+    	
+    }
+    public ArrayList<Double> getCoreInTemperature(int screenDomain)
+    {
+    	double temp;
+    	int konstant;
+    	//System.out.println("Getting HeatDiff");
+    	//System.out.println("Screen Domain: "+screenDomain);
+    	//System.out.println("P_pitherm Size: "+P_pitherm.size());
+    	temp=screenDomain/P_pitherm.size();  
+    	//System.out.println(" Amount: "+P_pitherm.size()/screenDomain);
+    //	System.out.println("Temp: "+temp);
+    	
+       	konstant=(int)P_pitherm.size()/screenDomain;
+    	//System.out.println("Konstant: "+konstant);
+    	ArrayList<Double> concatPiTherm= new ArrayList<>();
+    	for(int i=0;i<HeatDiff.size();i=i+konstant)
+    	{
+    		concatPiTherm.add(CoreInTemp.get(i));
+    	}
+    	    	return concatPiTherm;
+    	
+    }
+    public ArrayList<Double> getCoreReactorTemperature(int screenDomain)
+    {
+    	double temp;
+    	int konstant;
+    	//System.out.println("Getting HeatDiff");
+    	//System.out.println("Screen Domain: "+screenDomain);
+    	//System.out.println("P_pitherm Size: "+P_pitherm.size());
+    	temp=screenDomain/P_pitherm.size();  
+    	//System.out.println(" Amount: "+P_pitherm.size()/screenDomain);
+    //	System.out.println("Temp: "+temp);
+    	
+       	konstant=(int)P_pitherm.size()/screenDomain;
+    	//System.out.println("Konstant: "+konstant);
+    	ArrayList<Double> concatPiTherm= new ArrayList<>();
+    	for(int i=0;i<HeatDiff.size();i=i+konstant)
+    	{
+    		concatPiTherm.add(CoreReactorTemperature.get(i));
+    	}
+    	    	return concatPiTherm;
+    	
+    }
+    public ArrayList<Double> getJacketOutTemperature(int screenDomain)
+    {
+    	double temp;
+    	int konstant;
+    	//System.out.println("Getting HeatDiff");
+    	//System.out.println("Screen Domain: "+screenDomain);
+    	//System.out.println("P_pitherm Size: "+P_pitherm.size());
+    	temp=screenDomain/P_pitherm.size();  
+    	//System.out.println(" Amount: "+P_pitherm.size()/screenDomain);
+    //	System.out.println("Temp: "+temp);
+    	
+       	konstant=(int)P_pitherm.size()/screenDomain;
+    	//System.out.println("Konstant: "+konstant);
+    	ArrayList<Double> concatPiTherm= new ArrayList<>();
+    	for(int i=0;i<HeatDiff.size();i=i+konstant)
+    	{
+    		concatPiTherm.add(JacketOutGas.get(i));
+    	}
+    	    	return concatPiTherm;
+    	
+    }
+    public ArrayList<Double> getJacketInTemperature(int screenDomain)
+    {
+    	double temp;
+    	int konstant;
+    	//System.out.println("Getting HeatDiff");
+    	//System.out.println("Screen Domain: "+screenDomain);
+    	//System.out.println("P_pitherm Size: "+P_pitherm.size());
+    	temp=screenDomain/P_pitherm.size();  
+    	//System.out.println(" Amount: "+P_pitherm.size()/screenDomain);
+    //	System.out.println("Temp: "+temp);
+    	
+       	konstant=(int)P_pitherm.size()/screenDomain;
+    	//System.out.println("Konstant: "+konstant);
+    	ArrayList<Double> concatPiTherm= new ArrayList<>();
+    	for(int i=0;i<HeatDiff.size();i=i+konstant)
+    	{
+    		concatPiTherm.add(JacketInGas.get(i));
+    	}
+    	    	return concatPiTherm;
+    	
+    }
+    
     public boolean getArgon()
     {
     	return  argonExists;
