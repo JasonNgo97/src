@@ -32,6 +32,7 @@ public class Graph extends JPanel
 	private boolean CoreMS=false;
 	private boolean GasTemp=false;
 	private boolean ExcessPower=false;
+	private boolean shrink=false;
 	
 	
 	private static Stack<Step1Calculation> Step1LongCalcStack;
@@ -833,6 +834,15 @@ public class Graph extends JPanel
 		else{
 			table23=null;
 		}
+		if(parse.detectStep4Intervals()==true)
+		{
+			System.out.println("Step 4 works");
+			shrinkStack();
+		}	
+		else
+		{
+			System.out.println(" Step 4 is not here");
+		}
 		
 		
 	}
@@ -1018,7 +1028,7 @@ public class Graph extends JPanel
 					}
 					CoreInTempHold= new ColoredPoint(CoreInColor, i,CoreInTemp.get(i), "Index", "Degree");
 					CoreOutTempHold= new ColoredPoint(CoreOutColor, i,CoreOutTemp.get(i), "Index", "Degree");
-					CoreReactorTempHold= new ColoredPoint(CoreReactorColor, i,CoreOutTemp.get(i), "Index", "Degree");
+					CoreReactorTempHold= new ColoredPoint(CoreReactorColor, i,CoreReactorTemp.get(i), "Index", "Degree");
 					JacketInTempHold= new ColoredPoint(JacketInColor, i,JacketInTemp.get(i), "Index", "Degree");
 					JacketOutTempHold= new ColoredPoint(JacketOutColor, i,JacketOutTemp.get(i), "Index", "Degree");
 
@@ -1055,9 +1065,10 @@ public class Graph extends JPanel
 	{
 		LinkedList<Integer> pulseRange=	parse.getPulseRange();
 		
-		if(parse.detectStep2Intervals()==true)
-		{
+		
+		System.out.println("Inside Initialized");
 		parse.calculateStep2and3Intervals(past);
+		System.out.println(" Outside Initialized");
 		table23=parse.getTableCalc();
 		Step2and3CalcGRAPHStack.push(table23);
 		
@@ -1086,10 +1097,7 @@ public class Graph extends JPanel
 			
 		}
 //		step2and3Points.addAll(step2LLtemp);
-		}
-		else{
-			return;
-		}
+		
 	}
 	
 	public void setDayMonthYear(){
@@ -1127,5 +1135,165 @@ public class Graph extends JPanel
 		return -1;
 	}
 
+	// I want to change the return of this message
+	public void shrinkStack()
+	{
+		if(shrink==false)
+		{
+		Stack<Step2and3Calc> stackCopy=	(Stack<Step2and3Calc>)Step2and3CalcStack.clone();
+		Step2and3Calc temp=stackCopy.pop();  // This takes the first element as the base
+		Step2and3Calc holder;
+		//System.out.println("Temp: ");
+		//temp.printTable23();
+		System.out.println(" Stack Size is "+stackCopy.size());
+		int counter=0;
+		while(!stackCopy.isEmpty())
+		{
+			
+			holder=stackCopy.pop();
+			System.out.println("Size: "+stackCopy.size());
+	
+			//System.out.println("Holder is: ");
+			//holder.printTable23();
+			System.out.println(" Counter: "+"("+counter+")");
+			temp=compressTwoStep23Objects(temp,holder);
+			counter++;
+		}
+		System.out.println(" Done Shrinking ");
+		shrink=true;
+		}
+	}
+	public Step2and3Calc compressTwoStep23Objects( Step2and3Calc object1, Step2and3Calc object2)
+	{
+		System.out.println(" Before Compression 1: ");
+		object1.printTable23();
+		System.out.println("----------------------");
+		System.out.println(" Before Compression 2: ");
+		object2.printTable23();
+		System.out.println("----------------------");
+		
+		ArrayList<LinkedList<S_23>> table1=object1.getS23Table();
+		ArrayList<LinkedList<S_23>> table2=object2.getS23Table();
+		ArrayList<LinkedList<S_23>> tempList= new ArrayList<>();
+		for( int i=0;i<table1.size();i++) // Here you iterate through the ArrayList of the Table
+		{
+			for (int j=0;j<table2.size();j++)
+			{
+				// Here the pulse and temperature matching the LL
+				System.out.println("Table 1 Increment: "+i+"  Table 2 Increment: "+j);
+				System.out.println(" Size 1 Table: "+table1.size());
+				System.out.println(" Size 2 Table: "+table2.size());
+				System.out.println(" LL Size 1: "+table1.get(i).size());
+				System.out.println(" LL Size 2: "+table2.get(j).size());
+				if(table1.get(i).size()==0)
+				{
+					System.out.println(" Table 1 size is 0");
+					break;
+				}
+				if(table2.get(j).size()==0)
+				{
+					System.out.println(" Table 2 size is 0");
+					System.out.println("Incrementing");
+				}
+				else
+				{
+					System.out.println("Pulse Param 1: "+table1.get(i).get(0).getPulseParam());
+					System.out.println(" Temperature 1: "+table1.get(i).get(0).getTemperature());
+					System.out.println("Pulse Param 2: "+table2.get(j).get(0).getPulseParam());
+					System.out.println(" Temperature 2: "+table2.get(j).get(0).getTemperature());
+				if((table1.get(i).get(0).getPulseParam()==table2.get(j).get(0).getPulseParam()) && (table1.get(i).get(0).getTemperature()==table2.get(j).get(0).getTemperature()))
+				{
+				
+					System.out.println("Match! Pulse Param :"+table1.get(i).get(0).getPulseParam()+"  Temperature: "+table1.get(i).get(0).getTemperature());
+					double jacketAvg1=0;
+					double pulsePower1=0;
+					
+					double minJacket=10000;
+					double maxJacket=-1;
+					double minPulsePower=1000000;
+					double maxPulsePower=-1;
+					
+					double jacketAvg2=0;
+					double pulsePower2=0;
+					
+					for( int k=0;k<table1.get(i).size();k++)
+					{
+						if(table1.get(i).get(k).getMeanJacket()<minJacket)
+						{
+							minJacket=table1.get(i).get(k).getMeanJacket();
+						}
+						if(table1.get(i).get(k).getMeanJacket()>maxJacket)
+						{
+							maxJacket=table1.get(i).get(k).getMeanJacket();
+						}
+						if(table1.get(i).get(k).getMeanPulse()>maxPulsePower)
+						{
+							maxPulsePower=table1.get(i).get(k).getMeanPulse();
+						}
+						if(table1.get(i).get(k).getMeanPulse()<minPulsePower)
+						{
+							minPulsePower=table1.get(i).get(k).getMeanPulse();
+						}
+						
+						jacketAvg1+=table1.get(i).get(k).getMeanJacket();
+						pulsePower1+=table1.get(i).get(k).getMeanPulse();
+					}
+					jacketAvg1=jacketAvg1/table1.get(i).size();
+					pulsePower1=pulsePower1/table1.get(i).size();
+					for( int l=0;l<table2.get(j).size();l++)
+					{
+						if(table2.get(j).get(l).getMeanJacket()<minJacket)
+						{
+							minJacket=table2.get(j).get(l).getMeanJacket();
+						}
+						if(table2.get(j).get(l).getMeanJacket()>maxJacket)
+						{
+							maxJacket=table2.get(j).get(l).getMeanJacket();
+						}
+						if(table2.get(j).get(l).getMeanPulse()>maxPulsePower)
+						{
+							maxPulsePower=table2.get(j).get(l).getMeanPulse();
+						}
+						if(table2.get(j).get(l).getMeanPulse()<minPulsePower)
+						{
+							minPulsePower=table2.get(j).get(l).getMeanPulse();
+						}
+						
+						jacketAvg2+=table2.get(j).get(l).getMeanJacket();
+						pulsePower2+=table2.get(j).get(l).getMeanPulse();
+					}
+					jacketAvg2=jacketAvg2/table2.get(j).size();
+					pulsePower2=pulsePower2/table2.get(j).size();
+					
+					S_23 tempObj= new S_23( minPulsePower, maxPulsePower, minJacket,maxJacket, table1.get(i).get(0).getTemperature(), (jacketAvg2+jacketAvg1)/2, (pulsePower2+pulsePower1)/2, table1.get(i).get(0).getPulseParam(),true);
+					LinkedList<S_23> compressedLL= new LinkedList<>();
+					compressedLL.add(tempObj);
+					table1.get(i).clear();
+					table2.get(j).clear();
+
+					tempList.add(compressedLL);
+					
+					
+					
+					break;
+				}
+				else
+				{
+					System.out.println("Temperature and PP don't match");
+				}
+				}
+					
+				
+			}
+		}
+		Step2and3Calc temp= new Step2and3Calc(object1.getLOther(),tempList);
+		System.out.println("Testing Compression");
+		temp.printTable23();
+		System.out.println(" Done testing Compression");
+		return temp;
+		
+
+	}
+	
 }
 	

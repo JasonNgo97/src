@@ -132,15 +132,13 @@ public class StatPanel extends JPanel
 			e.printStackTrace();
 	       }
 	       
-	       add(tempPane);
+	       add(tempPane);   // This is add the label
 			
 			
 			
 			
-			
-			
-			
-			
+						
+			table.printTable23();
 			
 			for(int j=0;j<table.getS23Table().get(i).size();j++)
 			{  

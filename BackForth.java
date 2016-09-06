@@ -54,7 +54,6 @@ public class BackForth extends JPanel
 	 * |
 	 * |
 	 * |
-
 	 */
 	private boolean left=false;
 	private boolean buttonTouched=false;

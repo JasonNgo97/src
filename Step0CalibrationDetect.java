@@ -384,6 +384,9 @@ public class Step0CalibrationDetect
 		s0 temp;
 		if(helium==true)
 		{
+		
+		//	sortHeliumLL();
+			
 			for(int i=0;i<helium0.size();i++)
 			{
 				if(TemperatureFlat==helium0.get(i).getTemperature())
@@ -426,6 +429,9 @@ public class Step0CalibrationDetect
 		double avgCalb=0;
 		if(helium==true)
 		{
+			
+			//sortHeliumLL();
+			
 			//System.out.println("Inside Temp: "+tempTemperature);
 			if(tempTemperature<helium0.get(0).getTemperature())
 			{
@@ -794,6 +800,33 @@ public class Step0CalibrationDetect
 		
 		
 	}
+	public void sortHeliumLL()
+	{
+	//	private LinkedList<s0> helium0;
+	//	private LinkedList<s0> hydrogen0;
+		
+		
+		s0 temp;
+	for(int j=0;j<helium0.size()-1;j++)
+	{
+		System.out.println("j: "+j);
+		for(int i=0;i<helium0.size()-j;i++)
+		{
+			System.out.println("i: "+i);
+			System.out.println("i: "+i);
+
+		if(helium0.get(i).getHeatStep0()>helium0.get(i+1).getHeatStep0())
+		{
+			temp=(s0)helium0.get(i).clone();
+			helium0.get(i).setContents0(helium0.get(i+1).getTemperature(), helium0.get(i+1).getHeatStep0(), helium0.get(i+1).getHelium());
+			helium0.get(i+1).setContents0(temp.getTemperature(), temp.getHeatStep0(), temp.getHelium());
+		}
+		
+	}
+	}
+	}
+	
+	
 	public void printHeliumLL()
 	{
 		

@@ -71,6 +71,11 @@ public class LENRCSVParser
     static private ArrayList<String> Step2ShortTime;
     static private ArrayList<String> Step2Long;
     static private ArrayList<String> Step2LongIndex;
+    static private ArrayList<String> Step4Short;  // These hold the indices
+    static private ArrayList<String> Step4ShortTime;
+    static private ArrayList<String> Step4Long;
+    static private ArrayList<String> Step4LongIndex;
+    
 
     static private GasProp hydrogen;
     static private GasProp argon;
@@ -129,7 +134,11 @@ public class LENRCSVParser
               Step1Calc= new Stack<>();
               Step2Calc= new Stack<>();
               Step1LongCalc= new LinkedList<>();
-
+              Step4Short= new ArrayList<>();  // These hold the indices
+             Step4ShortTime= new ArrayList<>();
+             Step4Long= new ArrayList<>();
+             Step4LongIndex= new ArrayList<>();
+              
               hydrogen= new GasProp("hydrogen H2");
               argon= new GasProp("argon Ar");
               helium= new GasProp("helium He");
@@ -748,6 +757,8 @@ public class LENRCSVParser
         int endIndex=-1;
         boolean foundStep1=false;
         
+        System.out.println(" Argon:"+argonExists);
+        
         //System.out.println("Hello");
         // Here is the thing on the graph, you can't see it because it is negative
         for(int i=0;i<size-20;i++)
@@ -769,15 +780,15 @@ public class LENRCSVParser
                 //System.out.println("*****Step 1 Initialized*******");
                 //This tells you that the sequence has begun
                //	System.out.println("Heat Diff: "+HeatDiff.get(i));
-                //pulseParam=QPulseWidth.get(i);
+                pulseParam=QPulseWidth.get(i);
                 begin=true;
                 beginIndex=i;
                 begintime= time.get(beginIndex);
                 foundStep1=true;
-               // System.out.println("Pulse Param: "+pulseParam);
-                //System.out.println("Begin Time: "+begintime+" Begin Index: "+beginIndex);
-                //System.out.println(" P_pitherm: "+P_pitherm.get(i));
-                //System.out.println(" HeatDiff: "+HeatDiff.get(i));
+                System.out.println("Pulse Param: "+pulseParam);
+                System.out.println("Begin Time: "+begintime+" Begin Index: "+beginIndex);
+                System.out.println(" P_pitherm: "+P_pitherm.get(i));
+                System.out.println(" HeatDiff: "+HeatDiff.get(i));
                 //System.out.println(" HeatDiff +10: "+HeatDiff.get(i+10));
                 if(numCalTimes==0)
                 {
@@ -789,7 +800,30 @@ public class LENRCSVParser
             }
             // Changing Pulse Parm
           
+        	   if(P_pitherm.get(i)>2 && HeatDiff.get(i)<1
+                       && HeatDiff.get(i+20)<1 && QPulseWidth.get(i)!= pulseParam && begin==true) //This tells you that the sequence has begin
+               {
+                   //System.out.println("------Step 1 Finished------");
+                   //This tells you that the sequence has begun
+                   pulseParam=QPulseWidth.get(i);// Reinitialize the pulse Param
+                   begin=false;
+                   endIndex=i-1;
+                   endtime= time.get(endIndex);
+                   holder= begintime+"---"+endtime;
+                   indexHolder=beginIndex+"---"+ endIndex;
+                   //System.out.println(" Time Interval: "+holder);
+                   //System.out.println(" Index: "+beginIndex+ " ----- " +endIndex);
+                   // Start a new sequence
+                   Step1Short.add(indexHolder);
+                   Step1ShortTime.add(holder);
 
+                   //System.out.println("*****Step 1 ReInitialized*******");
+                   //System.out.println("Pulse Param: "+pulseParam);
+                   beginIndex=i;
+                   begintime=time.get(i);
+                   //System.out.println("Begin Time: "+begintime);
+                   begin=true;
+               }
             if(P_pitherm.get(i)<0.5  && HeatDiff.get(i)<1 && begin==true )
             {
                 endIndexFinal=i;
@@ -965,7 +999,115 @@ public class LENRCSVParser
             }
         return found2;
         }
+    public boolean detectStep4Intervals()
+    {
+    	/*  ---Thought Description----
+    	 * So pretty much this has to be broken into 3 phases
+    	 * phase 1: the beginning of the calibration
+    	 * phase 2: when the temperature or pulse parameter changes
+    	 * phase 3: when the QPow completely shuts off
+    	 */
+    	System.out.println(" Inside Step 4");
+    	int timesDetected=0;
+    	boolean foundStep4=false;
+    	int calibrationPressureHydrogen=600;
+    	int QPulsePowerStart=5;
+    	int beginIndex=-1;
+    	String endTime, holderIndex,holderTime;
+    	String beginTime= new String();
+    	String beginTimeInitial= new String();
+    	int beginIndexInitial=-1;
+    	String endTimeFinal;
+    	int endIndexFinal;
 
+    	int endIndex=-1;
+    	int pulseParam=-1;
+    	int temperature=-1;
+    	boolean intervalBegin=false;
+    	for( int i=0;i<QPow.size();i++)
+    	{
+    		if (CoreOutH2.get(i)>calibrationPressureHydrogen )
+    		{
+    		// This is pretty much saying if you hit the stable calibration pressure for hydrogen and your p_pi is on
+    			if(CoreOutH2.get(i)>calibrationPressureHydrogen && P_pitherm.get(i)>QPulsePowerStart && intervalBegin==false && QPulseWidth.get(i)>10)  
+    			{
+    				beginIndex=i;
+    				foundStep4=true;
+    				beginTime=time.get(i);
+    				intervalBegin=true;
+    				beginTimeInitial=beginTime;
+    				beginIndexInitial=beginIndex;
+    				pulseParam=QPulseWidth.get(i).intValue();
+    				temperature=CoreReactorTemperature.get(i).intValue();
+    				System.out.println("-------Step 4 Begins--------: ");
+    				System.out.println(" Time: "+beginTime);
+    				System.out.println(" Index: "+beginIndex);
+    				System.out.println(" Pulse Parameter: "+pulseParam);
+    				System.out.println(" Temperature: "+temperature);
+    			}
+    		// This is looking for the close of the interval, either pulse parameter change or temperature change
+    			if( (intervalBegin==true && pulseParam!= QPulseWidth.get(i).intValue()) || (intervalBegin==true && Math.abs(temperature- CoreReactorTemperature.get(i).intValue())>5) )
+    			{
+    				endIndex=i-1;
+    				endTime=time.get(i-1);
+    				holderTime=beginTime+"----"+endTime;
+    				holderIndex=beginIndex+"----"+endIndex;
+    				System.out.println(" Step 4 ended with Pulse Param: "+pulseParam+" and Temperature: "+CoreReactorTemperature.get(i));
+    				Step4Short.add(holderIndex);
+    				Step4ShortTime.add(holderTime);
+    				System.out.println(" Time: "+holderTime);
+    				System.out.println(" Index: "+holderIndex);
+    				System.out.println(" Reinitializing Step 4 Detection. ");
+    			
+    			
+    				beginIndex=i;
+    				beginTime=time.get(i);
+    				temperature=CoreReactorTemperature.get(i).intValue();
+    				pulseParam=QPulseWidth.get(i).intValue();
+    				System.out.println("--Step 4 Begins: ");
+    				System.out.println(" Time: "+beginTime);
+    				System.out.println(" Index: "+beginIndex);
+    				System.out.println(" Pulse Parameter: "+pulseParam);
+    				System.out.println(" Temperature: "+temperature);
+    			
+    			}
+    			 if(P_pitherm.get(i)<0.5   && intervalBegin==true )
+                 {
+
+                     System.out.println("*******Step 4*******DONE*****************");
+                     endIndexFinal=i;
+                     endIndex=i;
+                     endTime= time.get(endIndexFinal);
+                     endTimeFinal=time.get(endIndexFinal);
+                     holderIndex=beginIndex+"----"+endIndex;
+                     holderTime=beginTime+"----"+endTime;
+                     Step4Short.add(holderIndex);
+                     Step4ShortTime.add(holderTime);
+                     holderTime= "Time: "+beginTimeInitial+"------"+endTimeFinal;
+                     holderIndex= beginIndexInitial+"----"+endIndexFinal;
+                     holderTime+=" ||  Index: " +holderIndex;
+                     Step4Long.add(holderTime);
+                     Step4LongIndex.add(holderIndex);
+                 
+
+                 //reset
+                     beginTime= new String();
+                     endTime= new String();
+                     beginIndex=0;
+                     endIndex=0;
+                     pulseParam=0;
+                     temperature=-1;
+                     intervalBegin=false;
+             }
+    			
+    	}
+    	
+    	}
+    	
+    	
+    	return foundStep4;
+    }
+    
     public void calculateStep1Intervals()
     {
     	System.out.println("In step1 Calculation");
@@ -1048,6 +1190,7 @@ public class LENRCSVParser
           System.out.println("Step1 Long Index: "+temporLong.getIndex());
           temporLong.setMean(mean);
           Step1LongCalc.add(temporLong);
+          Step1Long.add(temporLong.getIndex());
        //   System.out.println("Mean:  "+mean);
      }
 
@@ -1202,6 +1345,7 @@ public class LENRCSVParser
             for( int i=0;i<Step2Short.size();i++)
                 //So this is for each interval
             {
+            	System.out.println(i+":");
                 interval=Step2Short.get(i);
                 //Split the interval into begin and end
                 holdShortInterval=interval.split("---");
@@ -1679,14 +1823,17 @@ public class LENRCSVParser
        	konstant=(int)P_pitherm.size()/screenDomain;
     	//System.out.println("Konstant: "+konstant);
     	ArrayList<Double> concatPiTherm= new ArrayList<>();
+    	System.out.println("Beginning Temperature: "+CoreReactorTemperature.get(0));
+    	System.out.println(" Zero Calibration: "+this.zero);
     	for(int i=0;i<HeatDiff.size();i=i+konstant)
     	{
     		concatPiTherm.add(HeatDiff.get(i));
+    	//	System.out.println(i+")Heat Diff"+HeatDiff.get(i));
     	}
     	    	return concatPiTherm;
     	
     }
-    
+  
     public ArrayList<Double> getHeliumCoreGas(int screenDomain)
     {
     	double temp;

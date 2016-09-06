@@ -10,6 +10,11 @@ public class Step2and3Calc
 		Step23Table= new ArrayList<>();
 	}
 
+	Step2and3Calc(double LOther, ArrayList<LinkedList<S_23>> Step23Table)
+	{
+		this.LOther=LOther;
+		this.Step23Table=Step23Table;
+	}
 	/*    Here is how I want the data structure to look like 
 	 * 						ArrayList
 	 * 						|| 	||
@@ -36,7 +41,10 @@ public class Step2and3Calc
 	 *				In this sort of hash table, LOther is the same
 	 *
 	 */
-	
+	public void addTable(ArrayList<LinkedList<S_23>> Step23Table)
+	{
+		this.Step23Table=Step23Table;
+	}
 	
 	public Object clone()
 	{
@@ -208,12 +216,19 @@ public class Step2and3Calc
 	public void printTable23()
 	{
 		System.out.println("--------Step 2 Calculations---------");
+		if(Step23Table.size()==0)
+		{
+			System.out.println("The table is null");
+			return;
+		}
 		for(int i=0;i<Step23Table.size();i++)
 			//This is pretty much the iteration through each of the LL in ArrayList
 		{
-			
+			System.out.println(" The size is "+Step23Table.get(i).size());
+			if(Step23Table.get(i).size()>0)
+			{
 			System.out.println(" LL with Pulse Param :"+ Step23Table.get(i).get(0).getPulseParam());
-			for( int j=0;j< Step23Table.get(i).size();j++)
+				for( int j=0;j< Step23Table.get(i).size();j++)
 				//Basically this iterates through each element of the LL
 			{
 				System.out.println("\t"+" ("+j+") ");
@@ -224,7 +239,7 @@ public class Step2and3Calc
 				System.out.println(" Temperature: "+Step23Table.get(i).get(j).getTemperature());
 				
 			}
-			
+			}
 			
 		}
 		System.out.println("------------------------------------");
@@ -232,6 +247,10 @@ public class Step2and3Calc
 	public ArrayList<LinkedList<S_23>> getS23Table()
 	{
 		return this.Step23Table;
+	}
+	public double getLOther()
+	{
+		return this.LOther;
 	}
 	
 	public LinkedList<S_23> getPulseParamTable(int pulseParameter)
