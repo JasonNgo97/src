@@ -1163,137 +1163,233 @@ public class Graph extends JPanel
 		shrink=true;
 		}
 	}
-	public Step2and3Calc compressTwoStep23Objects( Step2and3Calc object1, Step2and3Calc object2)
+	
+	
+	public Step2and3Calc compressTwoStep23Objects(Step2and3Calc obj1, Step2and3Calc obj2)
 	{
-		System.out.println(" Before Compression 1: ");
-		object1.printTable23();
-		System.out.println("----------------------");
-		System.out.println(" Before Compression 2: ");
-		object2.printTable23();
-		System.out.println("----------------------");
-		
-		ArrayList<LinkedList<S_23>> table1=object1.getS23Table();
-		ArrayList<LinkedList<S_23>> table2=object2.getS23Table();
-		ArrayList<LinkedList<S_23>> tempList= new ArrayList<>();
-		for( int i=0;i<table1.size();i++) // Here you iterate through the ArrayList of the Table
+		Step2and3Calc holder= new Step2and3Calc(obj1.getLOther());
+		ArrayList<LinkedList<S_23>> replacementTable= new ArrayList<>();
+		// To make sure, I want to compress all of obj1 repeating lists
+		obj1.compressRepeatingLL();
+		System.out.println(" Before Compression Table 1:");
+		obj1.printTable23();
+		System.out.println(" Before Compression Table 2:");
+		obj2.printTable23();
+		S_23 tempVariable;
+		boolean found=false;
+		for(int i=0;i<obj1.getS23Table().size();i++)
 		{
-			for (int j=0;j<table2.size();j++)
+			found=false;
+			for(int j=0;j<obj2.getS23Table().size();j++)
+			{ 
+				// This function works if there is a match
+				/*System.out.println(" Temperature 1: "+obj1.getS23Table().get(i).get(0).getTemperature()+ 
+						" Temperature 2: "+obj2.getS23Table().get(j).get(0).getTemperature() +"  "
+						+ "Pulse Param 1: "+obj1.getS23Table().get(i).get(0).getPulseParam()+
+						"  Pulse Param 2: " +  obj2.getS23Table().get(j).get(0).getPulseParam()); */
+				//System.out.println(" Index 1: "+i+ " Index 2: "+j);
+				//System.out.println(" Obj 1 Size "+obj1.getS23Table().size()+" Obj 2 Size :"+obj2.getS23Table().size());
+				if(obj1.getS23Table().get(i).get(0).getTemperature()==obj2.getS23Table().get(j).get(0).getTemperature() && obj1.getS23Table().get(i).get(0).getPulseParam()==obj2.getS23Table().get(j).get(0).getPulseParam())
+				{
+					found=true;
+					tempVariable=compressMatchingTableWithIndices(obj1,obj2,i,j);
+					LinkedList<S_23> TempLL23= new LinkedList<>();
+					TempLL23.add(tempVariable);
+					replacementTable.add(TempLL23);
+					System.out.println(" Match and True");
+					break;
+				}
+			}
+			if(found==false)
 			{
-				// Here the pulse and temperature matching the LL
-				System.out.println("Table 1 Increment: "+i+"  Table 2 Increment: "+j);
-				System.out.println(" Size 1 Table: "+table1.size());
-				System.out.println(" Size 2 Table: "+table2.size());
-				System.out.println(" LL Size 1: "+table1.get(i).size());
-				System.out.println(" LL Size 2: "+table2.get(j).size());
-				if(table1.get(i).size()==0)
-				{
-					System.out.println(" Table 1 size is 0");
-					break;
-				}
-				if(table2.get(j).size()==0)
-				{
-					System.out.println(" Table 2 size is 0");
-					System.out.println("Incrementing");
-				}
-				else
-				{
-					System.out.println("Pulse Param 1: "+table1.get(i).get(0).getPulseParam());
-					System.out.println(" Temperature 1: "+table1.get(i).get(0).getTemperature());
-					System.out.println("Pulse Param 2: "+table2.get(j).get(0).getPulseParam());
-					System.out.println(" Temperature 2: "+table2.get(j).get(0).getTemperature());
-				if((table1.get(i).get(0).getPulseParam()==table2.get(j).get(0).getPulseParam()) && (table1.get(i).get(0).getTemperature()==table2.get(j).get(0).getTemperature()))
-				{
-				
-					System.out.println("Match! Pulse Param :"+table1.get(i).get(0).getPulseParam()+"  Temperature: "+table1.get(i).get(0).getTemperature());
-					double jacketAvg1=0;
-					double pulsePower1=0;
-					
-					double minJacket=10000;
-					double maxJacket=-1;
-					double minPulsePower=1000000;
-					double maxPulsePower=-1;
-					
-					double jacketAvg2=0;
-					double pulsePower2=0;
-					
-					for( int k=0;k<table1.get(i).size();k++)
-					{
-						if(table1.get(i).get(k).getMeanJacket()<minJacket)
-						{
-							minJacket=table1.get(i).get(k).getMeanJacket();
-						}
-						if(table1.get(i).get(k).getMeanJacket()>maxJacket)
-						{
-							maxJacket=table1.get(i).get(k).getMeanJacket();
-						}
-						if(table1.get(i).get(k).getMeanPulse()>maxPulsePower)
-						{
-							maxPulsePower=table1.get(i).get(k).getMeanPulse();
-						}
-						if(table1.get(i).get(k).getMeanPulse()<minPulsePower)
-						{
-							minPulsePower=table1.get(i).get(k).getMeanPulse();
-						}
-						
-						jacketAvg1+=table1.get(i).get(k).getMeanJacket();
-						pulsePower1+=table1.get(i).get(k).getMeanPulse();
-					}
-					jacketAvg1=jacketAvg1/table1.get(i).size();
-					pulsePower1=pulsePower1/table1.get(i).size();
-					for( int l=0;l<table2.get(j).size();l++)
-					{
-						if(table2.get(j).get(l).getMeanJacket()<minJacket)
-						{
-							minJacket=table2.get(j).get(l).getMeanJacket();
-						}
-						if(table2.get(j).get(l).getMeanJacket()>maxJacket)
-						{
-							maxJacket=table2.get(j).get(l).getMeanJacket();
-						}
-						if(table2.get(j).get(l).getMeanPulse()>maxPulsePower)
-						{
-							maxPulsePower=table2.get(j).get(l).getMeanPulse();
-						}
-						if(table2.get(j).get(l).getMeanPulse()<minPulsePower)
-						{
-							minPulsePower=table2.get(j).get(l).getMeanPulse();
-						}
-						
-						jacketAvg2+=table2.get(j).get(l).getMeanJacket();
-						pulsePower2+=table2.get(j).get(l).getMeanPulse();
-					}
-					jacketAvg2=jacketAvg2/table2.get(j).size();
-					pulsePower2=pulsePower2/table2.get(j).size();
-					
-					S_23 tempObj= new S_23( minPulsePower, maxPulsePower, minJacket,maxJacket, table1.get(i).get(0).getTemperature(), (jacketAvg2+jacketAvg1)/2, (pulsePower2+pulsePower1)/2, table1.get(i).get(0).getPulseParam(),true);
-					LinkedList<S_23> compressedLL= new LinkedList<>();
-					compressedLL.add(tempObj);
-					table1.get(i).clear();
-					table2.get(j).clear();
-
-					tempList.add(compressedLL);
-					
-					
-					
-					break;
-				}
-				else
-				{
-					System.out.println("Temperature and PP don't match");
-				}
-				}
-					
-				
+			//This means that the index and value in 1 is not found in 2
+			found=true;
+			tempVariable=compressS23inTableIndex(obj1,i);
+			LinkedList<S_23> TempLL23= new LinkedList<>();
+			TempLL23.add(tempVariable);
+			System.out.println(" Index is in 1 but not in 2");
+			replacementTable.add(TempLL23);
+			}
+			
+		}
+		//This means that the index and value in 2 is not found in 1
+        LinkedList<PulseParamTemperature> range1= getLLofPulseParamAndTemperature(obj1);
+        LinkedList<PulseParamTemperature> range2= getLLofPulseParamAndTemperature(obj2);
+        
+        boolean checkElem2in1=false;
+        for(int i=0;i<range2.size();i++)
+        {
+        	PulseParamTemperature temporaryPulseTemp=range2.get(i);
+        	checkElem2in1=range1.contains(temporaryPulseTemp);
+        	if(checkElem2in1==false)
+        	{
+        		// Basically you find the index of the temperature and param, compress the LL and return that single object
+        		int index2=obj2.getIndexFromPulseParamAndTemperature(temporaryPulseTemp.getPulseParam(), temporaryPulseTemp.getTemperature());
+        		if(index2>0) // No error
+        		{
+        			tempVariable=compressS23inTableIndex(obj2, index2);
+        			LinkedList<S_23> TempLL23= new LinkedList<>();
+        			TempLL23.add(tempVariable);
+        			replacementTable.add(TempLL23);        			
+        		}
+        	}
+        }
+        holder.addTable(replacementTable);
+        System.out.println("Testing Compression");
+        holder.printTable23();
+        System.out.println("Done testing compresssion");
+        return holder;
+	}
+	
+	public LinkedList<PulseParamTemperature> getLLofPulseParamAndTemperature(Step2and3Calc obj)
+	{
+		ArrayList<LinkedList<S_23>> tempList=obj.getS23Table();
+		LinkedList<PulseParamTemperature> listToReturn= new LinkedList<>();
+		int tempTemperature;
+		double tempPulseParam;
+		PulseParamTemperature tempObj;
+		for(int i=0;i<tempList.size();i++)
+		{
+			tempTemperature=tempList.get(i).get(0).getTemperature();
+			tempPulseParam=tempList.get(i).get(0).getPulseParam();
+			tempObj= new PulseParamTemperature(tempPulseParam, tempTemperature);
+			if(listToReturn.contains(tempObj)==false)
+			{
+			listToReturn.add(tempObj);
 			}
 		}
-		Step2and3Calc temp= new Step2and3Calc(object1.getLOther(),tempList);
-		System.out.println("Testing Compression");
-		temp.printTable23();
-		System.out.println(" Done testing Compression");
-		return temp;
-		
+		return listToReturn;
+	}
+	
+	public S_23 compressS23inTableIndex(Step2and3Calc obj1, int index1)
+	{
+		double avgPulse1=0;
+		double avgJacket1=0;
+		double maxJacket=-1;
+		double minJacket=100000;
+		double maxPulse=-1;
+		double minPulse=1000000;
+		int numCompress=0;
+		numCompress=obj1.getS23Table().get(index1).get(0).getNumTimesCompressed();
+		for(int k=0;k<obj1.getS23Table().get(index1).size();k++)
+		{
+			numCompress++;
+			avgPulse1+=obj1.getS23Table().get(index1).get(k).getMeanPulse();
+			avgJacket1+=obj1.getS23Table().get(index1).get(k).getMeanJacket();
+			//Comparing Jackets
+			if(obj1.getS23Table().get(index1).get(k).getMeanJacket()>maxJacket)
+			{
+				maxJacket=obj1.getS23Table().get(index1).get(k).getMeanJacket();
+			}
+			if(obj1.getS23Table().get(index1).get(k).getMeanJacket()<minJacket)
+			{
+				minJacket=obj1.getS23Table().get(index1).get(k).getMeanJacket();
+			}
+			//Comparing Pulse
+			if(obj1.getS23Table().get(index1).get(k).getMeanPulse()<minPulse)
+			{
+				minPulse=obj1.getS23Table().get(index1).get(k).getMeanPulse();
+			}
+			if(obj1.getS23Table().get(index1).get(k).getMeanPulse()>maxPulse)
+			{
+				maxPulse=obj1.getS23Table().get(index1).get(k).getMeanPulse();
+			}
+			
+	   }
+		avgPulse1=avgPulse1/obj1.getS23Table().get(index1).size();
+		avgJacket1=avgJacket1/obj1.getS23Table().get(index1).size();
+		System.out.println(" Temperature: "+obj1.getS23Table().get(index1).get(0).getTemperature());
+		System.out.println(" Pulse Parameter: "+obj1.getS23Table().get(index1).get(0).getPulseParam());
+		System.out.println(" Average Jacket : "+avgJacket1);
+		System.out.println(" Average Pulse : "+avgPulse1);
+		System.out.println(" Num Times Compressed :"+numCompress);
+		S_23 replacement= new S_23(minPulse, maxPulse, minJacket, maxJacket,obj1.getS23Table().get(index1).get(0).getTemperature(),
+				avgJacket1,avgPulse1,obj1.getS23Table().get(index1).get(0).getPulseParam() ,true );
+		replacement.setNumTimesCompressed(numCompress);
+		return replacement;
+
+	}
+	
+	public S_23 compressMatchingTableWithIndices(Step2and3Calc obj1, Step2and3Calc obj2, int index1, int index2)
+	{
+		System.out.println("Match!");
+		double avgPulse1=0;
+		double avgPulse2=0;
+		double avgJacket1=0;
+		double avgJacket2=0;
+		double maxJacket=-1;
+		double minJacket=100000;
+		double maxPulse=-1;
+		double minPulse=1000000;
+		int numCompress=0;
+		for(int k=0;k<obj1.getS23Table().get(index1).size();k++)
+		{
+			//To be honest This should only go once
+			//System.out.println(" TESTING. This should only go over once.");   This statement is correct
+			numCompress=obj1.getS23Table().get(index1).get(0).getNumTimesCompressed();
+			avgPulse1+=obj1.getS23Table().get(index1).get(k).getMeanPulse();
+			avgJacket1+=obj1.getS23Table().get(index1).get(k).getMeanJacket();
+			//Comparing Jackets
+			if(obj1.getS23Table().get(index1).get(k).getMeanJacket()>maxJacket)
+			{
+				maxJacket=obj1.getS23Table().get(index1).get(k).getMeanJacket();
+			}
+			if(obj1.getS23Table().get(index1).get(k).getMeanJacket()<minJacket)
+			{
+				minJacket=obj1.getS23Table().get(index1).get(k).getMeanJacket();
+			}
+			//Comparing Pulse
+			if(obj1.getS23Table().get(index1).get(k).getMeanPulse()<minPulse)
+			{
+				minPulse=obj1.getS23Table().get(index1).get(k).getMeanPulse();
+			}
+			if(obj1.getS23Table().get(index1).get(k).getMeanPulse()>maxPulse)
+			{
+				maxPulse=obj1.getS23Table().get(index1).get(k).getMeanPulse();
+			}
+			
+	   }
+		avgPulse1=avgPulse1/obj1.getS23Table().get(index1).size();
+		avgJacket1=avgJacket1/obj1.getS23Table().get(index1).size();
+		System.out.println("Average Jacket 1: "+avgJacket1);
+		System.out.println("Average Pulse 1: "+avgPulse1);
+		System.out.println(" Num Compressed before Iterating Through 2: "+numCompress);
+		for(int l=0;l<obj2.getS23Table().get(index2).size();l++)
+		{
+			numCompress++;
+			avgPulse2+=obj2.getS23Table().get(index2).get(l).getMeanPulse();
+			avgJacket2+=obj2.getS23Table().get(index2).get(l).getMeanJacket();
+			//Comparing Jackets
+			if(obj2.getS23Table().get(index2).get(l).getMeanJacket()>maxJacket)
+			{
+				maxJacket=obj2.getS23Table().get(index2).get(l).getMeanJacket();
+			}
+			if(obj2.getS23Table().get(index2).get(l).getMeanJacket()<minJacket)
+			{
+				minJacket=obj2.getS23Table().get(index2).get(l).getMeanJacket();
+			}
+			//Comparing Pulse
+			if(obj2.getS23Table().get(index2).get(l).getMeanPulse()<minPulse)
+			{
+				minPulse=obj2.getS23Table().get(index2).get(l).getMeanPulse();
+			}
+			if(obj2.getS23Table().get(index2).get(l).getMeanPulse()>maxPulse)
+			{
+				maxPulse=obj2.getS23Table().get(index2).get(l).getMeanPulse();
+			}
+		}
+		avgPulse2=avgPulse2/obj2.getS23Table().get(index2).size();
+		avgJacket2=avgJacket2/obj2.getS23Table().get(index2).size();
+		System.out.println("Average Jacket 2: "+avgJacket2);
+		System.out.println("Average Pulse 2: "+avgPulse2);
+		S_23 replacement= new S_23(minPulse, maxPulse, minJacket, maxJacket,obj1.getS23Table().get(index1).get(0).getTemperature(),
+				(avgJacket1+avgJacket2)/2,(avgPulse1+avgPulse2)/2,obj1.getS23Table().get(index1).get(0).getPulseParam() ,true );
+		System.out.println(" Num Compressed after Iterating Through 2: "+numCompress);
+		replacement.setNumTimesCompressed(numCompress);
+		return replacement;
 
 	}
 	
 }
+
 	

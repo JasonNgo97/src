@@ -1243,6 +1243,8 @@ public class LENRCSVParser
 
         	//Use the past number
         	tableCalc= new Step2and3Calc(past.getMean());
+            tableCalc.setDate(time.get(0));
+
         	for( int i=0;i<Step2Short.size();i++)
                 //So this is for each interval
             {
@@ -1336,6 +1338,7 @@ public class LENRCSVParser
         	System.out.println("Step1 Internal size==1");
         	//Here you initialize the table
             tableCalc= new Step2and3Calc(Step1LongCalc.get(0).getMean());
+            tableCalc.setDate(time.get(0));
             /* So basically, you need to pop things off the stack and use those intervals
              * use the two members Step2Short which will contain the index
              *  use those indices to match the parameters pulse

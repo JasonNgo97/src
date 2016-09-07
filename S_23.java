@@ -22,6 +22,8 @@ public class S_23
 	private double maxPulse;
 	private boolean helium;
 	
+	private int numTimesCompressed=0;
+	
 	S_23(double minPulse, double maxPulse, double minJacket, double maxJacket, int temperature, double meanJacket, double meanPulse, double pulseParam, boolean helium)
 	{
 		System.out.println(" This is the avg constructor. ");
@@ -41,6 +43,8 @@ public class S_23
 		this.index=null;
 		this.beginIndex=-1;
 		this.endIndex=-1;
+		System.out.println(" Temperature :"+ this.Temperature +"  Pulse Param: "+pulseParam);
+		System.out.println(" Average Pulse Power: "+meanPulse+" Average Jacket Loss: "+ meanJacket);
 		
 	}
 	
@@ -109,6 +113,23 @@ public class S_23
 		// Now I want to break up the String index into begin and end
 		
 	}
+	public void increaseNumTimesCompressedby1()
+	{
+		numTimesCompressed++;
+	}
+	public void setNumTimesCompressed(int numTimes)
+	{
+		this.numTimesCompressed=numTimes;
+	}
+	public void addOnNumTimesCompressed( int numTimes)
+	{
+		this.numTimesCompressed=this.numTimesCompressed+numTimes;
+	}
+	public int getNumTimesCompressed()
+	{
+		return this.numTimesCompressed;
+	}
+	
 	public double getPulseParam()
 	{
 		return this.pulseParam;
@@ -168,6 +189,37 @@ public class S_23
 	public double getMinJacket()
 	{
 		return this.minimumJacket;
+	}
+	
+	public void setTemperature( int temperature)
+	{
+		this.Temperature=temperature;
+	}
+	public void setMeanPulse( double meanPulse)
+	{
+		this.meanPulse=meanPulse;
+		
+	}
+	public void setMeanJacket(double meanJacket)
+	{
+		this.meanJacket=meanJacket;
+	}
+	public void setJacketMin(double minJacket)
+	{
+		this.minimumJacket=minJacket;
+	}
+	public void setJacketMax(double maxJacket)
+	{
+		this.maximumJacket=maxJacket;
+		
+	}
+	public void setMinPulse(double minPulse)
+	{
+		this.minimumPulse=minPulse;
+	}
+	public void setMaxPulse(double maxPulse)
+	{
+		this.maximumPulse=maxPulse;
 	}
 	
 }
