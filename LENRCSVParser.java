@@ -62,6 +62,7 @@ public class LENRCSVParser
     static private Stack<Step2and3Calc> Step2Calc;
     static private LinkedList<Step1Calculation> Step1LongCalc;
     static private Step2and3Calc tableCalc;
+    static private Step4Calculation table4Calc;
 
     static private ArrayList<String> Step1Short;
     static private ArrayList<String> Step1ShortTime;
@@ -1432,7 +1433,124 @@ public class LENRCSVParser
         }
         }
        
+    public void calculateStep4Intervals(Step2and3Calc simplifiedStack)
+    {
+    	//initializeCoreTempDiff();
+    	table4Calc= new Step4Calculation(time.get(0));
+    	ArrayList<Double> PowOutList;
+		ArrayList<Double> ThermPowList;
+		ArrayList<Double> LPMList;
+		ArrayList<Double> CoreGasPressureList;
+		ArrayList<Double> CoreTempDifference;
+		ArrayList<Double> PHeaterList; //This is the Core Heataer Power used in LENR calculation
+		ArrayList<Double> CoreReactorTemperatureList;
+		
+		double TemporaryPHeater;
+		double TemporaryCoreTempDiff;
+		double TemporaryThermPow;
+		double TemporaryPowOut;
+		double TemporaryLPM;
+		double TemporaryCoreGasPressure;
+		double TemporaryCoreReactorTemperature;
+		
+		double PulseParam;
+		double TemperatureParam;
+		
+		GasLoss gl;
+		S_23 mappedElem;
+		
+		String interval;
+		String holdShortInterval[];
+		int beginIndex;
+		int endIndex;
+    	for(int i=0;i<Step4Short.size();i++)
+    	{
+    		//*** This is your constructor for GasLoss***
+    		
+    		
+    		/* 	S4(String index, S_23 paramObject, ArrayList<Double> PHeater4,GasLoss gl )
 
+
+    		 */
+    		interval=Step4Short.get(i);
+    		holdShortInterval=interval.split("---");
+    		beginIndex=(Integer.parseInt(holdShortInterval[0]));
+            endIndex=Math.abs((Integer.parseInt(holdShortInterval[1])));
+            // Initialize the ArrayList
+            PowOutList= new ArrayList<>();
+    		ThermPowList=new ArrayList<>();
+    		LPMList=new ArrayList<>();
+    		CoreTempDifference=new ArrayList<>();
+    		CoreGasPressureList= new ArrayList<>();
+    		PHeaterList=new ArrayList<>();
+    		CoreReactorTemperatureList= new ArrayList<>();
+    		
+    		mappedElem=simplifiedStack.getFirstElemOfLL(QPulseWidth.get(beginIndex+1),(int)(this.CoreReactorTemperature.get(beginIndex)+this.CoreReactorTemperature.get(endIndex))/2);
+    		if(mappedElem==null)
+    		{
+    			System.out.println("No Match");
+    		}
+    		else
+    		{
+    		for( int j=beginIndex;j<endIndex;j++)
+    		{
+    			TemporaryPHeater=CoreHeaterPow.get(j);
+    			TemporaryCoreGasPressure=CoreInPressure.get(j);
+    			TemporaryCoreTempDiff=CoreTempDiff.get(j);
+    			TemporaryThermPow=LCoolant.get(j);
+    			TemporaryPowOut=PowOut.get(j);;
+    			TemporaryLPM=H2MakeUpLPM.get(j);
+    			TemporaryCoreReactorTemperature=CoreReactorTemperature.get(j);
+    			
+    			PowOutList.add(TemporaryPowOut);
+    			ThermPowList.add(TemporaryThermPow);
+    			LPMList.add(TemporaryLPM);
+        		CoreTempDifference.add(TemporaryCoreTempDiff);
+        		PHeaterList.add(TemporaryPHeater);
+        		CoreReactorTemperatureList.add(TemporaryCoreReactorTemperature);
+    			
+    			
+    			
+    			
+    		}
+    		//Convert the LPM
+    		double CoreTempPressure=0;
+    		int CorePressureHolder=0;
+    		for(int k=0;k<CoreInPressure.size();k++)
+    		{
+    			CoreTempPressure+=CoreInPressure.get(i);
+    		}
+    		CorePressureHolder=(int)CoreTempPressure/CoreInPressure.size();
+    		double mappedDensity=0;
+    		double mappedSpecificHeat=0;
+			mappedDensity=hydrogen.getDensity(mappedElem.getTemperature(), CorePressureHolder);
+			mappedSpecificHeat=hydrogen.getHeatCapacity(mappedElem.getTemperature(), CorePressureHolder);
+			
+			ArrayList<Double> convertLPM= new ArrayList<>();
+			double LPMHolder=0;
+			for(int p=0;p<LPMList.size();p++)
+			{
+				LPMHolder=(LPMList.get(i)/(60*1000))*mappedDensity;
+				convertLPM.add(LPMHolder);
+			}
+//			public GasLoss(ArrayList<Double> PowOut,
+    		//ArrayList<Double> ThermPow, Double HeatCapacityCP ,
+    		//ArrayList<Double> ConvertedLPM, ArrayList<Double> tempCoreDiff, 
+    		//boolean helium, String index)
+			gl= new GasLoss(PowOutList,ThermPowList,mappedSpecificHeat,convertLPM,CoreTempDifference,false,interval);
+			S4 calculateObj= new S4(interval,mappedElem,PHeaterList,gl);
+			System.out.println("Adding "+calculateObj.toString());
+			table4Calc.addS4(calculateObj);
+    		
+    		
+    		
+    		
+    		//Now how do you map the heat capacity
+    		}
+    	}
+    	System.out.println(" Printing out Table");
+    	table4Calc.printStep4Table();
+    }
     
     
     public int CalculateAvgTemperature(ArrayList<Double> Temperature)

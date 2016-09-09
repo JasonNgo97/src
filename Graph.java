@@ -37,6 +37,7 @@ public class Graph extends JPanel
 	
 	private static Stack<Step1Calculation> Step1LongCalcStack;
 	private static Stack<Step2and3Calc> Step2and3CalcStack;
+	private static Step2and3Calc simplifiedStackCalc;
 	private static StatPanel statPanel;
 	
 	
@@ -838,6 +839,8 @@ public class Graph extends JPanel
 		{
 			System.out.println("Step 4 works");
 			shrinkStack();
+			parse.calculateStep4Intervals(simplifiedStackCalc);
+			// Do a calculation by passing through the number
 		}	
 		else
 		{
@@ -1160,8 +1163,15 @@ public class Graph extends JPanel
 			counter++;
 		}
 		System.out.println(" Done Shrinking ");
+		temp.printTable23();
+		simplifiedStackCalc=temp;
 		shrink=true;
 		}
+		
+		
+		
+		
+		
 	}
 	
 	
@@ -1170,11 +1180,13 @@ public class Graph extends JPanel
 		Step2and3Calc holder= new Step2and3Calc(obj1.getLOther());
 		ArrayList<LinkedList<S_23>> replacementTable= new ArrayList<>();
 		// To make sure, I want to compress all of obj1 repeating lists
-		obj1.compressRepeatingLL();
-		System.out.println(" Before Compression Table 1:");
+		System.out.println(" Before Compression Table 1");
 		obj1.printTable23();
-		System.out.println(" Before Compression Table 2:");
-		obj2.printTable23();
+		obj1.compressRepeatingLL();
+		System.out.println(" After Compression Table 1:");
+		obj1.printTable23();
+		//System.out.println(" Before Compression Table 2:");
+		//obj2.printTable23();
 		S_23 tempVariable;
 		boolean found=false;
 		for(int i=0;i<obj1.getS23Table().size();i++)
@@ -1235,9 +1247,10 @@ public class Graph extends JPanel
         	}
         }
         holder.addTable(replacementTable);
-        System.out.println("Testing Compression");
-        holder.printTable23();
-        System.out.println("Done testing compresssion");
+        //System.out.println("Testing Compression");
+      //  holder.compressRepeatingLL();
+        //holder.printTable23();
+        //System.out.println("Done testing compresssion");
         return holder;
 	}
 	
@@ -1270,6 +1283,7 @@ public class Graph extends JPanel
 		double maxPulse=-1;
 		double minPulse=1000000;
 		int numCompress=0;
+		System.out.println();
 		numCompress=obj1.getS23Table().get(index1).get(0).getNumTimesCompressed();
 		for(int k=0;k<obj1.getS23Table().get(index1).size();k++)
 		{
@@ -1286,13 +1300,26 @@ public class Graph extends JPanel
 				minJacket=obj1.getS23Table().get(index1).get(k).getMeanJacket();
 			}
 			//Comparing Pulse
-			if(obj1.getS23Table().get(index1).get(k).getMeanPulse()<minPulse)
+			if(obj1.getS23Table().get(index1).get(k).getMeanPulse()<minPulse && obj1.getS23Table().get(index1).get(k).getMeanPulse()>0)
 			{
 				minPulse=obj1.getS23Table().get(index1).get(k).getMeanPulse();
 			}
 			if(obj1.getS23Table().get(index1).get(k).getMeanPulse()>maxPulse)
 			{
 				maxPulse=obj1.getS23Table().get(index1).get(k).getMeanPulse();
+				System.out.println(" MAX Index: "+obj1.getS23Table().get(index1).get(k).getIndex()+ " MAX PULSE: "+maxPulse);
+				System.out.println(" MAX MAX INDEX: "+obj1.getS23Table().get(index1).get(k).getIndex()+ " MAX MAX PULSE "+obj1.getS23Table().get(index1).get(k).getMaxPulse());
+			}
+			if(obj1.getS23Table().get(index1).get(k).getMinPulse()<minPulse && obj1.getS23Table().get(index1).get(k).getMinPulse()>0)
+			{
+				minPulse=obj1.getS23Table().get(index1).get(k).getMinPulse();
+			}
+			if(obj1.getS23Table().get(index1).get(k).getMaxPulse()>maxPulse)
+			{
+				maxPulse=obj1.getS23Table().get(index1).get(k).getMaxPulse();
+				System.out.println(" MAX Index: "+ obj1.getS23Table().get(index1).get(k).getIndex()+" MEAN PULSE: "+obj1.getS23Table().get(index1).get(k).getMeanPulse());
+				System.out.println(" MAX Index: "+obj1.getS23Table().get(index1).get(k).getIndex()+ " MAX PULSE: "+maxPulse);
+
 			}
 			
 	   }
@@ -1339,13 +1366,21 @@ public class Graph extends JPanel
 				minJacket=obj1.getS23Table().get(index1).get(k).getMeanJacket();
 			}
 			//Comparing Pulse
-			if(obj1.getS23Table().get(index1).get(k).getMeanPulse()<minPulse)
+			if(obj1.getS23Table().get(index1).get(k).getMeanPulse()<minPulse &&obj1.getS23Table().get(index1).get(k).getMeanPulse()>0)
 			{
 				minPulse=obj1.getS23Table().get(index1).get(k).getMeanPulse();
 			}
-			if(obj1.getS23Table().get(index1).get(k).getMeanPulse()>maxPulse)
+			if(obj1.getS23Table().get(index1).get(k).getMeanPulse()>maxPulse && obj1.getS23Table().get(index1).get(k).getMeanPulse()>0)
 			{
 				maxPulse=obj1.getS23Table().get(index1).get(k).getMeanPulse();
+			}
+			if(obj1.getS23Table().get(index1).get(k).getMinPulse()<minPulse && obj1.getS23Table().get(index1).get(k).getMinPulse()>0)
+			{
+				minPulse=obj1.getS23Table().get(index1).get(k).getMinPulse();
+			}
+			if(obj1.getS23Table().get(index1).get(k).getMaxPulse()>maxPulse&& obj1.getS23Table().get(index1).get(k).getMaxPulse()>0)
+			{
+				maxPulse=obj1.getS23Table().get(index1).get(k).getMaxPulse();
 			}
 			
 	   }
@@ -1354,9 +1389,13 @@ public class Graph extends JPanel
 		System.out.println("Average Jacket 1: "+avgJacket1);
 		System.out.println("Average Pulse 1: "+avgPulse1);
 		System.out.println(" Num Compressed before Iterating Through 2: "+numCompress);
+		double tempNumJacket1Undivided=avgJacket1*numCompress;
+		double tempNumPulse1Undivided=avgPulse1*numCompress;
+		int numCompress2=0;
 		for(int l=0;l<obj2.getS23Table().get(index2).size();l++)
 		{
 			numCompress++;
+			numCompress2++;
 			avgPulse2+=obj2.getS23Table().get(index2).get(l).getMeanPulse();
 			avgJacket2+=obj2.getS23Table().get(index2).get(l).getMeanJacket();
 			//Comparing Jackets
@@ -1369,27 +1408,51 @@ public class Graph extends JPanel
 				minJacket=obj2.getS23Table().get(index2).get(l).getMeanJacket();
 			}
 			//Comparing Pulse
-			if(obj2.getS23Table().get(index2).get(l).getMeanPulse()<minPulse)
+			if(obj2.getS23Table().get(index2).get(l).getMeanPulse()<minPulse && obj2.getS23Table().get(index2).get(l).getMeanPulse()>0)
 			{
 				minPulse=obj2.getS23Table().get(index2).get(l).getMeanPulse();
 			}
-			if(obj2.getS23Table().get(index2).get(l).getMeanPulse()>maxPulse)
+			if(obj2.getS23Table().get(index2).get(l).getMeanPulse()>maxPulse && obj2.getS23Table().get(index2).get(l).getMeanPulse()>0)
 			{
 				maxPulse=obj2.getS23Table().get(index2).get(l).getMeanPulse();
 			}
+			if(obj2.getS23Table().get(index2).get(l).getMinPulse()<minPulse && obj2.getS23Table().get(index2).get(l).getMinPulse()>0)
+			{
+				minPulse=obj2.getS23Table().get(index2).get(l).getMinPulse();
+			}
+			if(obj2.getS23Table().get(index2).get(l).getMaxPulse()>maxPulse&& obj2.getS23Table().get(index2).get(l).getMaxPulse()>0)
+			{
+				maxPulse=obj2.getS23Table().get(index2).get(l).getMaxPulse();
+			}
 		}
+		System.out.println(" Num Compressed after Iterating Through 2: "+numCompress);
+
 		avgPulse2=avgPulse2/obj2.getS23Table().get(index2).size();
 		avgJacket2=avgJacket2/obj2.getS23Table().get(index2).size();
+	
 		System.out.println("Average Jacket 2: "+avgJacket2);
 		System.out.println("Average Pulse 2: "+avgPulse2);
-		S_23 replacement= new S_23(minPulse, maxPulse, minJacket, maxJacket,obj1.getS23Table().get(index1).get(0).getTemperature(),
-				(avgJacket1+avgJacket2)/2,(avgPulse1+avgPulse2)/2,obj1.getS23Table().get(index1).get(0).getPulseParam() ,true );
-		System.out.println(" Num Compressed after Iterating Through 2: "+numCompress);
-		replacement.setNumTimesCompressed(numCompress);
-		return replacement;
+		System.out.println(" Min Pulse: "+minPulse);
+		System.out.println(" MAX Pulse: "+maxPulse);
+		S_23 replacement;
+		if(Math.abs(avgPulse2-avgPulse1)>2)
+		{
+			 replacement= new S_23(minPulse, maxPulse, minJacket, maxJacket,obj1.getS23Table().get(index1).get(0).getTemperature(),
+					avgJacket1,avgPulse1,obj1.getS23Table().get(index1).get(0).getPulseParam() ,true );
 
+		}
+		else
+		{
+	//	S_23 replacement= new S_23(minPulse, maxPulse, minJacket, maxJacket,obj1.getS23Table().get(index1).get(0).getTemperature(),
+		//		(avgJacket1+avgJacket2)/2,(avgPulse1+avgPulse2)/2,obj1.getS23Table().get(index1).get(0).getPulseParam() ,true );
+		 replacement= new S_23(minPulse, maxPulse, minJacket, maxJacket,obj1.getS23Table().get(index1).get(0).getTemperature(),
+				(avgJacket1+avgJacket2)/2,(avgPulse1+avgPulse2)/2,obj1.getS23Table().get(index1).get(0).getPulseParam() ,true );
+		replacement.setNumTimesCompressed(numCompress);
+
+		}
+		System.out.println(" MAX Pulse of Replacement: "+replacement.getMaxPulse());
+		return replacement;
 	}
-	
 }
 
 	

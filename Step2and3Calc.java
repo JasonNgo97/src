@@ -125,6 +125,98 @@ public class Step2and3Calc
 		return -1;
 	}
 	
+	public double getMinPulsePower(int temperature, double pulseParam)
+	{
+		double minPulsePower=100000;
+		for(int i=0;i<Step23Table.size();i++)
+		{
+			
+			for(int j=0;j<Step23Table.get(i).size();j++)
+			{
+				if(Step23Table.get(i).get(j).getPulseParam()==pulseParam &&
+						Step23Table.get(i).get(j).getTemperature()==temperature)
+				{
+				
+				if(Step23Table.get(i).get(j).getMeanPulse()<minPulsePower)
+				{
+					minPulsePower=Step23Table.get(i).get(j).getMeanPulse();
+					//System.out.println("Exchanging");
+				}
+				}
+				
+			}
+			
+		}
+		return minPulsePower;
+	}
+	public double getMaxPulsePower(int temperature, double pulseParam)
+	{
+		double maxPulsePower=0;
+		for(int i=0;i<Step23Table.size();i++)
+		{
+			
+			for(int j=0;j<Step23Table.get(i).size();j++)
+			{
+				if(Step23Table.get(i).get(j).getPulseParam()==pulseParam &&
+						Step23Table.get(i).get(j).getTemperature()==temperature)
+				{
+				
+				if(Step23Table.get(i).get(j).getMeanPulse()>maxPulsePower)
+				{
+					maxPulsePower=Step23Table.get(i).get(j).getMeanPulse();
+					//System.out.println("Exchanging");
+				}
+				}
+				
+			}
+			
+		}
+		return maxPulsePower;
+		
+	}
+	public double getMaxPulsePowerMAX(int temperature, double pulseParam)
+	{
+		double maxPulsePower=0;
+		for(int i=0;i<Step23Table.size();i++)
+		{
+			if(Step23Table.get(i).get(0).getPulseParam()==pulseParam &&
+					Step23Table.get(i).get(0).getTemperature()==temperature)
+			{
+			for(int j=0;j<Step23Table.get(i).size();j++)
+			{
+				if(Step23Table.get(i).get(j).getMaxPulse()>maxPulsePower)
+				{
+					maxPulsePower=Step23Table.get(i).get(j).getMaxPulse();
+				}
+				
+			}
+			}
+		}
+		return maxPulsePower;
+		
+	}
+	public double getMinPulseMIN(int temperature, double pulseParam)
+	{
+		double minPulsePower=1000;
+		for(int i=0;i<Step23Table.size();i++)
+		{
+			if(Step23Table.get(i).get(0).getPulseParam()==pulseParam &&
+					Step23Table.get(i).get(0).getTemperature()==temperature)
+			{
+			for(int j=0;j<Step23Table.get(i).size();j++)
+			{
+				if(Step23Table.get(i).get(j).getMinPulse()<minPulsePower)
+				{
+					minPulsePower=Step23Table.get(i).get(j).getMinPulse();
+				}
+				
+			}
+			}
+		}
+		return minPulsePower;
+	}
+	
+	
 	
 	public void compressRepeatingLL()
 	{
@@ -140,71 +232,159 @@ public class Step2and3Calc
 		double pulseMin=1000;
 		double pulseMax=-10;
 		int numTimesCompressed=0;
+		
+		System.out.println("Variation Print");
+		for(int j=0;j<variation.size();j++)
+		{
+			System.out.println(variation.get(j).toString());
+		}
+		
 		for(int i=0;i<variation.size();i++)
 		{	
 			numTimesCompressed=0; //Reinitialize it to 0
 			temp=variation.get(i);
+			double minPulsePower=getMinPulsePower(temp.getTemperature(), temp.getPulseParam());
+			double minMinPulsePower=getMinPulseMIN(temp.getTemperature(), temp.getPulseParam());
+			double maxPulsePower=getMaxPulsePower(temp.getTemperature(), temp.getPulseParam());
+			double maxMaxPulsePower=getMaxPulsePowerMAX(temp.getTemperature(), temp.getPulseParam());
+
+			System.out.println(" MinMin Pulse Power :"+minMinPulsePower+" Temperature: "+temp.getTemperature()+" Pulse Param: "+temp.getPulseParam());
+			System.out.println(" MaxMax Pulse Power :"+maxMaxPulsePower+" Temperature: "+temp.getTemperature()+" Pulse Param: "+temp.getPulseParam());
+			System.out.println(" Min Pulse Power :"+minPulsePower+" Temperature: "+temp.getTemperature()+" Pulse Param: "+temp.getPulseParam());
+			System.out.println(" Max Pulse Power :"+maxPulsePower+" Temperature: "+temp.getTemperature()+" Pulse Param: "+temp.getPulseParam());	
+			System.out.println("1: "+getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam()));
+
+//			System.out.println(" MinMin Pulse Power :"+minMinPulsePower+" Temperature: "+temp.getTemperature()+" Pulse Param: "+temp.getPulseParam());
+//			System.out.println(" MaxMax Pulse Power :"+maxMaxPulsePower+" Temperature: "+temp.getTemperature()+" Pulse Param: "+temp.getPulseParam());
 			indexFirstOccurence=getNthOccuranceOfTemperatureandPulseParam(1,temp.getTemperature(), temp.getPulseParam());
 			while(getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam())!=-1)  //Basically about 2nd repeats
 					{
+				System.out.println("N: "+getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam()));
 					numTimesCompressed++;
-				    jacket=(Step23Table.get(indexFirstOccurence).get(0).getMeanJacket()+
+				    /*jacket=(Step23Table.get(indexFirstOccurence).get(0).getMeanJacket()*Step23Table.get(indexFirstOccurence).get(0).getNumTimesCompressed()+
+				    		Step23Table.get(getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam())).get(0).getMeanJacket()
+				    		*Step23Table.get(getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam())).get(0).getNumTimesCompressed())/(Step23Table.get(indexFirstOccurence).get(0).getNumTimesCompressed()
+				    				+Step23Table.get(getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam())).get(0).getNumTimesCompressed());
+				    pulsePower=(Step23Table.get(indexFirstOccurence).get(0).getMeanPulse()*Step23Table.get(indexFirstOccurence).get(0).getNumTimesCompressed()+
+				    		Step23Table.get(getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam())).get(0).getMeanPulse()
+				    		*Step23Table.get(getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam())).get(0).getNumTimesCompressed())/(Step23Table.get(indexFirstOccurence).get(0).getNumTimesCompressed()
+				    				+Step23Table.get(getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam())).get(0).getNumTimesCompressed());
+				   */
+					if(Step23Table.get(getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam())).get(0).getMeanJacket()-minPulsePower<2)
+					{
+					
+						jacket=(Step23Table.get(indexFirstOccurence).get(0).getMeanJacket()+
 				    		Step23Table.get(getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam())).get(0).getMeanJacket())/2;
-				    pulsePower=(Step23Table.get(indexFirstOccurence).get(0).getMeanPulse()+
+						pulsePower=(Step23Table.get(indexFirstOccurence).get(0).getMeanPulse()+
 				    		Step23Table.get(getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam())).get(0).getMeanPulse())/2;
-				   
-				    //Comparing Jacket
-				    if(Step23Table.get(indexFirstOccurence).get(0).getMeanJacket()>jacketMax)
-				    {
-				    	jacketMax=Step23Table.get(indexFirstOccurence).get(0).getMeanJacket();
-				    }
-				    if(Step23Table.get(indexFirstOccurence).get(0).getMeanJacket()<jacketMin)
-				    {
-				    	jacketMin=Step23Table.get(indexFirstOccurence).get(0).getMeanJacket();
-				    }
-				    if(Step23Table.get(getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam())).get(0).getMeanJacket()>jacketMax)
-				    {
-				    	jacketMax=Step23Table.get(getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam())).get(0).getMeanJacket();
-				    }
-				    if(Step23Table.get(getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam())).get(0).getMeanJacket()<jacketMin)
-				    {
-				    	jacketMin=Step23Table.get(getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam())).get(0).getMeanJacket();
-				    }
+				    
+						//Comparing Jacket
+							if(Step23Table.get(indexFirstOccurence).get(0).getMeanJacket()>jacketMax)
+							{
+								jacketMax=Step23Table.get(indexFirstOccurence).get(0).getMeanJacket();
+							}
+							if(Step23Table.get(indexFirstOccurence).get(0).getMeanJacket()<jacketMin)
+							{
+								jacketMin=Step23Table.get(indexFirstOccurence).get(0).getMeanJacket();
+							}
+							if(Step23Table.get(getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam())).get(0).getMeanJacket()>jacketMax)
+							{
+								jacketMax=Step23Table.get(getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam())).get(0).getMeanJacket();
+							}
+							if(Step23Table.get(getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam())).get(0).getMeanJacket()<jacketMin)
+							{
+								jacketMin=Step23Table.get(getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam())).get(0).getMeanJacket();
+							}
 				    
 				    //Comparing Pulse
-				    if(Step23Table.get(indexFirstOccurence).get(0).getMeanPulse()>pulseMax)
-				    {
-				    	pulseMax=Step23Table.get(indexFirstOccurence).get(0).getMeanPulse();
-				    }
-				    if(Step23Table.get(indexFirstOccurence).get(0).getMeanPulse()<pulseMin)
-				    {
-				    	pulseMin=Step23Table.get(indexFirstOccurence).get(0).getMeanPulse();
-				    }
-				    if(Step23Table.get(getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam())).get(0).getMeanPulse()>pulseMax)
-				    {
-				    	pulseMax=Step23Table.get(getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam())).get(0).getMeanPulse();
-				    }
-				    if(Step23Table.get(getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam())).get(0).getMeanPulse()<pulseMin)
-				    {
-				    	pulseMin=Step23Table.get(getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam())).get(0).getMeanPulse();
-				    }
-				    // Inside while loop
-				    
+							if(Step23Table.get(indexFirstOccurence).get(0).getMeanPulse()>pulseMax)
+							{
+								pulseMax=Step23Table.get(indexFirstOccurence).get(0).getMeanPulse();
+							}
+							if(Step23Table.get(indexFirstOccurence).get(0).getMeanPulse()<pulseMin)
+							{
+								pulseMin=Step23Table.get(indexFirstOccurence).get(0).getMeanPulse();
+							}
+							if(Step23Table.get(getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam())).get(0).getMeanPulse()>pulseMax)
+							{
+								pulseMax=Step23Table.get(getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam())).get(0).getMeanPulse();
+							}
+							if(Step23Table.get(getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam())).get(0).getMeanPulse()<pulseMin)
+							{
+								pulseMin=Step23Table.get(getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam())).get(0).getMeanPulse();
+							}
+				    // Inside if statement loop
+					}
+					else{
+						jacket=Step23Table.get(indexFirstOccurence).get(0).getMeanJacket();
+						 pulsePower=Step23Table.get(indexFirstOccurence).get(0).getMeanPulse();
+						 
+					}
 				    Step23Table.get(indexFirstOccurence).get(0).setMeanJacket(jacket);
 				    Step23Table.get(indexFirstOccurence).get(0).setMeanPulse(pulsePower);
-				    
+				    System.out.println(" Removing "+getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam()));
 				    Step23Table.remove(getNthOccuranceOfTemperatureandPulseParam(2,temp.getTemperature(), temp.getPulseParam()));
 					}
 			
 			// No more 2nd occurances
+			/*
+			 double minPulsePower=getMinPulsePower(temp.getTemperature(), temp.getPulseParam());
+			double minMinPulsePower=getMinPulseMIN(temp.getTemperature(), temp.getPulseParam());
+			double maxPulsePower=getMaxPulsePower(temp.getTemperature(), temp.getPulseParam());
+			double maxMaxPulsePower=getMaxPulsePowerMAX(temp.getTemperature(), temp.getPulseParam());
+			 */
+			if(minPulsePower>minMinPulsePower && maxPulsePower>maxMaxPulsePower)
+			{
+			System.out.println("Inside 1:");
 			Step23Table.get(indexFirstOccurence).get(0).setJacketMax(jacketMax);
 			Step23Table.get(indexFirstOccurence).get(0).setJacketMin(jacketMin);
-			Step23Table.get(indexFirstOccurence).get(0).setMinPulse(pulseMin);
-			Step23Table.get(indexFirstOccurence).get(0).setMaxPulse(pulseMax);
+			Step23Table.get(indexFirstOccurence).get(0).setMinPulse(minMinPulsePower);
+			Step23Table.get(indexFirstOccurence).get(0).setMaxPulse(maxPulsePower);
 			Step23Table.get(indexFirstOccurence).get(0).addOnNumTimesCompressed(numTimesCompressed);;
+			}
+			if(minPulsePower>minMinPulsePower && maxPulsePower<maxMaxPulsePower)
+			{
+				System.out.println("Inside 2:");
 
+			Step23Table.get(indexFirstOccurence).get(0).setJacketMax(jacketMax);
+			Step23Table.get(indexFirstOccurence).get(0).setJacketMin(jacketMin);
+			Step23Table.get(indexFirstOccurence).get(0).setMinPulse(minMinPulsePower);
+			Step23Table.get(indexFirstOccurence).get(0).setMaxPulse(maxMaxPulsePower);
+			Step23Table.get(indexFirstOccurence).get(0).addOnNumTimesCompressed(numTimesCompressed);;
+			System.out.println(" Min Pulse: "+Step23Table.get(indexFirstOccurence).get(0).getMinPulse()+" MAX Pulse: "+Step23Table.get(indexFirstOccurence).get(0).getMaxPulse());
+			System.out.println();
 
-			
+			}
+			if(minPulsePower<minMinPulsePower && maxPulsePower>maxMaxPulsePower)
+			{
+				System.out.println("Inside 3:");
+
+			Step23Table.get(indexFirstOccurence).get(0).setJacketMax(jacketMax);
+			Step23Table.get(indexFirstOccurence).get(0).setJacketMin(jacketMin);
+			Step23Table.get(indexFirstOccurence).get(0).setMinPulse(minPulsePower);
+			Step23Table.get(indexFirstOccurence).get(0).setMaxPulse(maxPulsePower);
+			Step23Table.get(indexFirstOccurence).get(0).addOnNumTimesCompressed(numTimesCompressed);;
+			}
+			if(minPulsePower<minMinPulsePower && maxPulsePower<maxMaxPulsePower)
+			{
+				System.out.println("Inside 4:");
+
+			Step23Table.get(indexFirstOccurence).get(0).setJacketMax(jacketMax);
+			Step23Table.get(indexFirstOccurence).get(0).setJacketMin(jacketMin);
+			Step23Table.get(indexFirstOccurence).get(0).setMinPulse(minPulsePower);
+			Step23Table.get(indexFirstOccurence).get(0).setMaxPulse(maxMaxPulsePower);
+			Step23Table.get(indexFirstOccurence).get(0).addOnNumTimesCompressed(numTimesCompressed);;
+			}
+			/*else
+			{
+				Step23Table.get(indexFirstOccurence).get(0).setJacketMax(jacketMax);
+				Step23Table.get(indexFirstOccurence).get(0).setJacketMin(jacketMin);
+				Step23Table.get(indexFirstOccurence).get(0).setMinPulse(minMinPulsePower);
+				Step23Table.get(indexFirstOccurence).get(0).setMaxPulse(maxMaxPulsePower);
+				Step23Table.get(indexFirstOccurence).get(0).addOnNumTimesCompressed(numTimesCompressed);;
+				
+			}
+			*/
 			
 		}
 		
@@ -246,7 +426,7 @@ public class Step2and3Calc
 		}
 		
 		
-		System.out.println(" No more "+ n +" occurances");
+		//System.out.println(" No more "+ n +" occurances");
 		return -1;
 		
 	}
@@ -274,7 +454,8 @@ public class Step2and3Calc
 	
 	public void addArray(String index, ArrayList<Double> QPow, ArrayList<Double> H2MakeUpLPM, ArrayList<Double> tempDiff,
 			ArrayList<Double> LCoolant2, double pulseParam, ArrayList<Double> H2, ArrayList<Double> HE, ArrayList<Double> PowOut, ArrayList<Double> HeaterPow,
-			ArrayList<Double> JacketTemp, ArrayList<Double> JacketPressure, ArrayList<Double> CoreTempDiff, ArrayList<Double> CoreTemp, ArrayList<Double> CorePressure,GasProp hydrogen, GasProp helium, int CoreReactorTemperature)
+			ArrayList<Double> JacketTemp, ArrayList<Double> JacketPressure, ArrayList<Double> CoreTempDiff, ArrayList<Double> CoreTemp,
+			ArrayList<Double> CorePressure,GasProp hydrogen, GasProp helium, int CoreReactorTemperature)
 	{
 		//So basically what I want this to do is to scan the arrayList to see if there are any matching parameters
 		
@@ -454,9 +635,14 @@ public class Step2and3Calc
 			{
 				System.out.println("\t"+" ("+j+") ");
 				System.out.println(" Index: "+Step23Table.get(i).get(j).getIndex());
-				System.out.println(" Num Compressions: "+Step23Table.get(i).get(j).getNumTimesCompressed());
+				//System.out.println(" Num Compressions: "+Step23Table.get(i).get(j).getNumTimesCompressed());
 				System.out.println(" Mean Jacket : "+Step23Table.get(i).get(j).getMeanJacket());
+		//		System.out.println(" Max Jacket : "+Step23Table.get(i).get(j).getMaxJacket());
+			//	System.out.println(" Min Jacket : "+Step23Table.get(i).get(j).getMinJacket());
 				System.out.println(" Mean Pulse Power: "+Step23Table.get(i).get(j).getMeanPulse());
+				System.out.println(" Max Pulse Power : "+Step23Table.get(i).get(j).getMaxPulse());
+				System.out.println(" Min Pulse Power : "+Step23Table.get(i).get(j).getMinPulse());
+
 				System.out.println(" Gas: "+Step23Table.get(i).get(j).getGas());
 				System.out.println(" Temperature: "+Step23Table.get(i).get(j).getTemperature());
 				
@@ -547,6 +733,31 @@ public class Step2and3Calc
 		{
 			temp=Step23Table.get(i);
 			if((int)temp.get(0).getPulseParam()==pulseParameter)
+			{
+				return temp;
+			}
+			
+		}
+		return null;
+	}
+	public S_23 getFirstElemOfLL(double pulseParameter, int temperature)
+	{
+		System.out.println(" Pulse Param: "+pulseParameter+"  Temperature: "+temperature);
+		LinkedList<S_23> temp=getPulseParamTable(pulseParameter,temperature);
+		if(temp==null)
+		{
+			return null;
+		}
+		System.out.println(temp.get(0).toString());
+		return temp.get(0);
+	}
+	public LinkedList<S_23> getPulseParamTable(double pulseParameter, int temperature)
+	{
+		LinkedList<S_23> temp;
+		for(int i=0;i<Step23Table.size();i++)
+		{
+			temp=Step23Table.get(i);
+			if(temp.get(0).getPulseParam()==pulseParameter &&temp.get(0).getTemperature()==temperature)
 			{
 				return temp;
 			}

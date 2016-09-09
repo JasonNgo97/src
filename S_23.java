@@ -7,8 +7,9 @@ public class S_23
 	private int endIndex;
 	private double pulseParam;
 	
-	private double maximumPulse;
 	private double minimumPulse;
+	private double maxPulse;
+
 	private double maximumJacket;
 	private double minimumJacket;
 	
@@ -19,7 +20,6 @@ public class S_23
 	private double meanPulse;
 	private double meanJacket;
 	private double maxJacket;
-	private double maxPulse;
 	private boolean helium;
 	
 	private int numTimesCompressed=0;
@@ -28,7 +28,9 @@ public class S_23
 	{
 		System.out.println(" This is the avg constructor. ");
 		this.maximumJacket=maxJacket;
-		this.maximumPulse=maxPulse;
+		//this.maximumPulse=maxPulse;
+		this.maxPulse=maxPulse;
+		
 		this.minimumPulse=minPulse;
 		this.minimumJacket=minJacket;
 		this.Temperature=temperature;
@@ -44,7 +46,8 @@ public class S_23
 		this.beginIndex=-1;
 		this.endIndex=-1;
 		System.out.println(" Temperature :"+ this.Temperature +"  Pulse Param: "+pulseParam);
-		System.out.println(" Average Pulse Power: "+meanPulse+" Average Jacket Loss: "+ meanJacket);
+		//System.out.println(" Average Pulse Power: "+meanPulse+" Average Jacket Loss: "+ meanJacket);
+		System.out.println(" Min Pulse: "+minimumPulse+ " MAX Pulse: "+maxPulse +" Mean Pulse "+ this.meanPulse);
 		
 	}
 	
@@ -54,6 +57,7 @@ public class S_23
 	S_23(String index, double LOther, ArrayList<Double> QPow, ArrayList<Double> LCoolant, double pulseParam, GasLoss gLoss, ArrayList<Double> HeaterPow, ArrayList<Double> tempDiff, ArrayList<Double> LPM, boolean helium, int Temperature)
 	{
 		maxPulse=0;
+		double minPulse=10000;
 		maxJacket=0;
 		System.out.println("Index: "+index);
 		String holder[];
@@ -90,6 +94,10 @@ public class S_23
 			{
 				maxPulse=temp;
 			}
+			if(temp<minPulse)
+			{
+				minPulse=temp;
+			}
 			//System.out.println(beginIndex+i+" QPow : "+QPow.get(i)+" LCoolant: "+LCoolant.get(i)+" LOther:" +this.LOther);
 			tempHolder= HeaterPow.get(i)+ temp- gLoss.get(i);
 			if(tempHolder>maxJacket)
@@ -103,6 +111,7 @@ public class S_23
 			JacketLoss.add(tempHolder);
 		}
 		meanPulse=sum/(QPow.size());
+		this.minimumPulse=minPulse;
 		meanJacket=sum2/(QPow.size());
 		System.out.println("Pulse Param: "+pulseParam);
 		System.out.println("Mean Pulse: "+meanPulse);
@@ -219,7 +228,7 @@ public class S_23
 	}
 	public void setMaxPulse(double maxPulse)
 	{
-		this.maximumPulse=maxPulse;
+		this.maxPulse=maxPulse;
 	}
 	
 }
