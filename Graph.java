@@ -715,7 +715,6 @@ public class Graph extends JPanel
 		
 		for(int i=0;i<pointToPlot.size();i++) //Iterate through the ArrayList
 		{
-			g.setColor(pointToPlot.get(i).get(0).getColor()); //This sets the color
 			domainTemp=domainMax;
 			xBottomTemp=domainMax;
 			scaleMX=xBottomTemp/domainTemp;
@@ -723,6 +722,8 @@ public class Graph extends JPanel
 			
 			for(int j=0;j<pointToPlot.get(i).size();j++)// This iterates through the LL
 			{
+				g.setColor(pointToPlot.get(i).get(j).getColor()); //This sets the color
+
 				pX=origin.getX()+scaleMX*pointToPlot.get(i).get(j).getX();
 				pY=xBottomAxis.getY() - scaleMY*pointToPlot.get(i).get(j).getY();
 				pointX=(int)pX;
@@ -770,6 +771,18 @@ public class Graph extends JPanel
 	public void initializeColoredPoints(String date,boolean HeaterQPulse, boolean ExcessPower, boolean CoreMS, boolean gasTemps, Point origin, Point xBottomAxis, Step1Calculation past)
 	{
 		LENRCSVParser parse= new LENRCSVParser(date,step0);
+		if(parse.detectStep4Intervals()==true)
+		{
+			System.out.println("Step 4 works");
+			shrinkStack();
+			parse.calculateStep4Intervals(simplifiedStackCalc);
+			// Do a calculation by passing through the number
+		}	
+		else
+		{
+			System.out.println(" Step 4 is not here");
+		}
+		
 		if(pointToPlot.size()>0)
 		{
 			pointToPlot.clear();
@@ -789,7 +802,16 @@ public class Graph extends JPanel
 		{
 			InitializeGasTemp(parse);
 		}
-		
+		if(ExcessPower)
+		{
+			System.out.println();
+			if(parse.getStep4Table()!=null)
+			{
+			initializeExcessPower(parse);
+			}
+			System.out.println();
+
+		}
 		
 		
 		ArrayList<Double> step1List;
@@ -834,17 +856,6 @@ public class Graph extends JPanel
 		}
 		else{
 			table23=null;
-		}
-		if(parse.detectStep4Intervals()==true)
-		{
-			System.out.println("Step 4 works");
-			shrinkStack();
-			parse.calculateStep4Intervals(simplifiedStackCalc);
-			// Do a calculation by passing through the number
-		}	
-		else
-		{
-			System.out.println(" Step 4 is not here");
 		}
 		
 		
@@ -1063,6 +1074,34 @@ public class Graph extends JPanel
 
 
 	}
+	
+	public void initializeExcessPower(LENRCSVParser parse)
+	{
+		LinkedList<ColoredPoint> ExcessPowList=	parse.getStep4Points(GraphPanelWidth);
+		System.out.println(" Size of EXCESS POW LIST: "+ExcessPowList.size());
+		double TempRangeMax=0;
+		for(int j=0;j<ExcessPowList.size();j++)
+		{
+			if(ExcessPowList.get(j).getY()!=0)
+			{
+				//System.out.println(ExcessPowList.get(j).getX()+"  "+ExcessPowList.get(j).getY());
+			}
+			if(TempRangeMax<ExcessPowList.get(j).getY())
+			{
+				TempRangeMax=ExcessPowList.get(j).getY();
+			}
+			if(ExcessPowList.get(j).getColor().equals(Color.RED))
+			{
+			  System.out.println(" RED :"+"  "+ExcessPowList.get(j).getY());	
+			}
+		}
+		System.out.println(" Range MAX: "+TempRangeMax);
+		RangeMax=TempRangeMax;
+		pointToPlot.add(ExcessPowList);
+
+	}
+	
+	
 	
 	public void initializeStep2Points(LENRCSVParser parse, Step1Calculation past, Point origin)
 	{

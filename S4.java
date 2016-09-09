@@ -80,8 +80,14 @@ public class S4
 	   +this.MAXLENR+"\n"+" MIN LENR: "+this.MINLENR;
 		return x;
 	}
-	
- 
+	public double getPulseParam()
+	{
+		return this.PulseParam;
+	}
+	public int getTemperature()
+	{
+		return this.Temperature;
+	}
 	private void calculateStep4()
 	{
 		double tempLENRmin;
@@ -216,9 +222,15 @@ public class S4
 		return this.AVGLENRavg;
 	}
 	
-	
-	
-	public double getMAXLENRmax()
+	public int getBeginIndex()
+	{
+		return this.beginIndex;
+	}
+	public int getEndIndex()
+	{
+		return this.endIndex;
+	}
+public double getMAXLENRmax()
 	{
 		return this.MAXLENRmax;
 	}

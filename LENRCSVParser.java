@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
+import java.awt.*;
 public class LENRCSVParser
 {
     /*
@@ -1109,6 +1110,11 @@ public class LENRCSVParser
     	return foundStep4;
     }
     
+    public Step4Calculation getStep4Table()
+    {
+    	return this.table4Calc;
+    }
+    
     public void calculateStep1Intervals()
     {
     	System.out.println("In step1 Calculation");
@@ -1551,7 +1557,69 @@ public class LENRCSVParser
     	System.out.println(" Printing out Table");
     	table4Calc.printStep4Table();
     }
-    
+    public LinkedList<ColoredPoint> getStep4Points(int screenDomain)
+    {
+    	LinkedList<ColoredPoint> tempList= new LinkedList<>();
+     	int konstant=(int)P_pitherm.size()/screenDomain;
+     	ColoredPoint tempMinLENR;
+     	ColoredPoint tempMAXLENR;
+     	ColoredPoint tempAVGLENR;
+     	
+     	Color minLENRcolor= Color.RED;
+     	Color avgLENRcolor= Color.BLUE;
+     	Color maxLENRcolor= Color.YELLOW;
+
+     	// The konstant is the rate that you increment off of.
+    	//System.out.println("Konstant: "+konstant);
+     	int numIteration=0;
+     	boolean begin=false;
+    	for(int i=0;i<HeatDiff.size();i=i+konstant)
+    	{
+    		
+    		
+    		
+    		if(table4Calc.checkIndices(i)==true )
+    		{
+    			//JacketOutTempHold= new ColoredPoint(JacketOutColor, i,JacketOutTemp.get(i), "Index", "Degree");
+    			//	ColoredPoint(Color color, double xComp, double yComp, String xLabel, String yLabel)
+    			System.out.println("\t"+"("+i+")");
+    			System.out.print("MAX LENR "+i+" : ");
+    			tempMAXLENR= new ColoredPoint(maxLENRcolor,numIteration,table4Calc.getMaxLENRPowerAtIndex(i),"Index","Degree");
+    			System.out.println(tempMAXLENR.getY());
+    			tempMinLENR=new ColoredPoint(minLENRcolor,numIteration,table4Calc.getMinLENRPowerAtIndex(i),"Index","Degree");
+    			System.out.print("MIN LENR "+i+"  ");
+    			System.out.println(tempMinLENR.getY());
+    			tempAVGLENR=new ColoredPoint(avgLENRcolor,numIteration,table4Calc.getAvgLENRPowerAtIndex(i),"Index","Degree");
+    			System.out.print("AVG LENR "+i+"  ");
+    			System.out.println(tempAVGLENR.getY());
+    			
+    		
+
+    			
+    			tempList.add(tempMAXLENR);
+    			tempList.add(tempMinLENR);
+    			tempList.add(tempAVGLENR);
+
+
+    		
+    		}
+    		else
+    		{
+    			tempList.add(new ColoredPoint(maxLENRcolor,numIteration,0,"Index","Degree"));   
+    			tempList.add(new ColoredPoint(avgLENRcolor,numIteration,0,"Index","Degree"));  
+    			tempList.add(new ColoredPoint(minLENRcolor,numIteration,0,"Index","Degree"));   
+
+    		}
+    		numIteration++;
+    		
+    	}
+    	
+    	
+    	
+    	
+    	
+    	return tempList;
+    }
     
     public int CalculateAvgTemperature(ArrayList<Double> Temperature)
     {
