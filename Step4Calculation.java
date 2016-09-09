@@ -4,6 +4,11 @@ public class Step4Calculation
 	private String date;
 	private ArrayList<S4> Step4Table;
 	
+	public ArrayList<S4> getStep4Table()
+	{
+		return this.Step4Table;
+	}
+	
 	Step4Calculation(String date)
 	{
 		this.date=date;

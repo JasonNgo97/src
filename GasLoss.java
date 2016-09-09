@@ -76,7 +76,10 @@ public class GasLoss
 		 
 		 
 	}
-	
+	public int size()
+	{
+		return gLoss.size();
+	}
 	public Double get(int i)
 	{
 		return gLoss.get(i);

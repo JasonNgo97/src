@@ -1582,16 +1582,16 @@ public class LENRCSVParser
     		{
     			//JacketOutTempHold= new ColoredPoint(JacketOutColor, i,JacketOutTemp.get(i), "Index", "Degree");
     			//	ColoredPoint(Color color, double xComp, double yComp, String xLabel, String yLabel)
-    			System.out.println("\t"+"("+i+")");
-    			System.out.print("MAX LENR "+i+" : ");
+    		//	System.out.println("\t"+"("+i+")");
+    		//	System.out.print("MAX LENR "+i+" : ");
     			tempMAXLENR= new ColoredPoint(maxLENRcolor,numIteration,table4Calc.getMaxLENRPowerAtIndex(i),"Index","Degree");
-    			System.out.println(tempMAXLENR.getY());
+    		//	System.out.println(tempMAXLENR.getY());
     			tempMinLENR=new ColoredPoint(minLENRcolor,numIteration,table4Calc.getMinLENRPowerAtIndex(i),"Index","Degree");
-    			System.out.print("MIN LENR "+i+"  ");
-    			System.out.println(tempMinLENR.getY());
+    		//	System.out.print("MIN LENR "+i+"  ");
+    		//	System.out.println(tempMinLENR.getY());
     			tempAVGLENR=new ColoredPoint(avgLENRcolor,numIteration,table4Calc.getAvgLENRPowerAtIndex(i),"Index","Degree");
-    			System.out.print("AVG LENR "+i+"  ");
-    			System.out.println(tempAVGLENR.getY());
+    		//	System.out.print("AVG LENR "+i+"  ");
+    		//	System.out.println(tempAVGLENR.getY());
     			
     		
 
@@ -2196,4 +2196,8 @@ public class LENRCSVParser
     {
     	return  argonExists;
     }
+    public Step4Calculation getTable()
+{
+	return this.table4Calc;
+}
 }

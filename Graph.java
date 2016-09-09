@@ -23,6 +23,8 @@ public class Graph extends JPanel
 	
 	
 	private Step2and3Calc table23;  // This holds the one for the exact day
+	private Step4Calculation table4;
+	
 	private Step0CalibrationDetect step0;
 	private double electricalLoss;
 	private Step1Calculation step1Calibration;
@@ -39,6 +41,8 @@ public class Graph extends JPanel
 	private static Stack<Step2and3Calc> Step2and3CalcStack;
 	private static Step2and3Calc simplifiedStackCalc;
 	private static StatPanel statPanel;
+	
+	
 	
 	
 	private JTextField dateHolder1;
@@ -612,7 +616,14 @@ public class Graph extends JPanel
 
 		drawPoints(g,origin,yTopAxis,xBottomAxis);
 		drawScale(g,origin,xBottomAxis,yTopAxis);
-		statPanel.updateInformation(electricalLoss, table23);
+		if(table4==null  || table4.getSize()==0)
+		{
+		statPanel.updateInformation(electricalLoss, table23,null,null);
+		}
+		else
+		{
+			statPanel.updateInformation(electricalLoss, table23,table4,simplifiedStackCalc);
+		}
 		System.out.println("************************");
 		statPanel.repaint();
 
@@ -771,11 +782,13 @@ public class Graph extends JPanel
 	public void initializeColoredPoints(String date,boolean HeaterQPulse, boolean ExcessPower, boolean CoreMS, boolean gasTemps, Point origin, Point xBottomAxis, Step1Calculation past)
 	{
 		LENRCSVParser parse= new LENRCSVParser(date,step0);
+		this.table4=null;
 		if(parse.detectStep4Intervals()==true)
 		{
 			System.out.println("Step 4 works");
 			shrinkStack();
 			parse.calculateStep4Intervals(simplifiedStackCalc);
+			this.table4=parse.getStep4Table();
 			// Do a calculation by passing through the number
 		}	
 		else
@@ -1096,9 +1109,17 @@ public class Graph extends JPanel
 			}
 		}
 		System.out.println(" Range MAX: "+TempRangeMax);
+		
 		RangeMax=TempRangeMax;
+		System.out.println("Testing Table Print");
+		if(table4!=null)
+		{
+		for(int i=0;i<table4.getSize();i++)
+		{
+			System.out.println(table4.get(i).toString());
+		}
 		pointToPlot.add(ExcessPowList);
-
+		}
 	}
 	
 	

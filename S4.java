@@ -1,3 +1,4 @@
+import java.text.DecimalFormat;
 import java.util.*;
 
 public class S4 
@@ -84,9 +85,71 @@ public class S4
 	{
 		return this.PulseParam;
 	}
+	public double getPulsePowerMean()
+	{
+		DecimalFormat df = new DecimalFormat("#.00");
+		Double pulseMean=this.PulsePowerMean;
+		String jacketValue= df.format(pulseMean);
+		pulseMean=Double.parseDouble(jacketValue);
+		return pulseMean;
+	}
+	public double getPulsePowerMAX()
+	{
+		DecimalFormat df = new DecimalFormat("#.00");
+		Double pulseMAX=this.PulsePowerMax;
+		String jacketValue= df.format(pulseMAX);
+		pulseMAX=Double.parseDouble(jacketValue);
+		return pulseMAX;
+	}
+	public double getPulsePowerMIN()
+	{
+		DecimalFormat df = new DecimalFormat("#.00");
+		Double pulseMin=this.PulsePowerMin;
+		String jacketValue= df.format(pulseMin);
+		pulseMin=Double.parseDouble(jacketValue);
+		return pulseMin;
+	}
+	public double getJacket()
+	{
+		DecimalFormat df = new DecimalFormat("#.00");
+		Double jacketL=this.JacketLoss;
+		String jacketValue= df.format(jacketL);
+
+		jacketL=Double.parseDouble(jacketValue);
+		return jacketL;
+	}
 	public int getTemperature()
 	{
 		return this.Temperature;
+	}
+	public double PHeaterAvg()
+	{
+		double konstant=0;
+		DecimalFormat df = new DecimalFormat("#.00");
+
+		for(int j=0;j<PHeater4.size();j++)
+		{
+			konstant+=PHeater4.get(j);
+		}
+		konstant=konstant/PHeater4.size();
+		String gValue= df.format(konstant);
+		konstant=Double.parseDouble(gValue);
+		return konstant;
+	}
+	
+	public double GLossAVG()
+	{
+		DecimalFormat df = new DecimalFormat("#.00");
+
+		double gLossAmount=0;
+		for(int i=0;i<gLoss.size();i++)
+		{
+			gLossAmount+=gLoss.get(i);
+		}
+		gLossAmount=gLossAmount/gLoss.size();
+		String gValue= df.format(gLossAmount);
+		gLossAmount=Double.parseDouble(gValue);
+		return gLossAmount;
 	}
 	private void calculateStep4()
 	{
@@ -98,6 +161,21 @@ public class S4
 			tempLENRavg=this.JacketLoss-PHeater4.get(i)-PulsePowerMean+gLoss.get(i);
 			tempLENRmax=this.JacketLoss-PHeater4.get(i)-PulsePowerMin+gLoss.get(i);
 			tempLENRmin=this.JacketLoss-PHeater4.get(i)-PulsePowerMax+gLoss.get(i);
+			
+			if(tempLENRavg<MINLENR)
+			{
+				MINLENR=tempLENRavg;
+			}
+			if(tempLENRmax<MINLENR)
+			{
+				MINLENR=tempLENRmax;
+			}
+			if(tempLENRmin<MINLENR)
+			{
+				MINLENR=tempLENRmin;
+			}
+			
+			
 			
 			minLENR.add(tempLENRmin);
 			maxLENR.add(tempLENRmax);
@@ -164,21 +242,8 @@ public class S4
 		
 		
 		
-		if(MINLENRavg>MINLENRmin && MINLENRmax>MINLENRmin)
-		{
-			MINLENR=MINLENRmin;
-		}
 		
-		if(MINLENRavg>MINLENRmax && MINLENRmin>MINLENRmax)
-		{
-			MINLENR=MINLENRmax;
-		}
-		
-		if(MINLENRavg<MINLENRmin && MINLENRmax>MINLENRavg)
-		{
-			MINLENR=MINLENRavg;
-		}
-		
+
 		
 		AVGLENR=(AVGLENRavg+AVGLENRmin+AVGLENRmax)/3;
 		
@@ -230,7 +295,7 @@ public class S4
 	{
 		return this.endIndex;
 	}
-public double getMAXLENRmax()
+	public double getMAXLENRmax()
 	{
 		return this.MAXLENRmax;
 	}
