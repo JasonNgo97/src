@@ -258,7 +258,7 @@ public class StatPanel extends JPanel
 		    		   " + "+table4.getStep4Table().get(j).GLossAVG()
 		    		   +" - "+table4.getStep4Table().get(j).PHeaterAvg()
 		    		   +" - "+table4.getStep4Table().get(j).getPulsePowerMean()
-		    		   +"\n"+"\t"+"\t"+" '=' "+table4.getStep4Table().get(j).getAVGLENRavg();
+		    		   +"\n"+"\t"+"\t"+" = "+table4.getStep4Table().get(j).getAVGLENRavg();
 
 		    		   
 		       

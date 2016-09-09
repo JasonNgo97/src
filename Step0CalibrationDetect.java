@@ -378,6 +378,7 @@ public class Step0CalibrationDetect
 	}
 	public double getCalibrationConstant(double Temperature, boolean helium)
 	{
+		sortHeliumLLandHydrogenLL();
 		double calibrationConstant=-1;
 		double Temperature0=Math.round(Temperature);
 		int TemperatureFlat=(int)Temperature0;
@@ -424,6 +425,7 @@ public class Step0CalibrationDetect
 	
 	public double getNearestCalibrationConstant(double Temperature, boolean helium)
 	{
+		sortHeliumLLandHydrogenLL();
 		double temporaryTemperature=Math.round(Temperature);
 		int tempTemperature=(int)temporaryTemperature;
 		double avgCalb=0;
@@ -800,31 +802,137 @@ public class Step0CalibrationDetect
 		
 		
 	}
-	public void sortHeliumLL()
+	public void sortHeliumLLandHydrogenLL()
 	{
 	//	private LinkedList<s0> helium0;
 	//	private LinkedList<s0> hydrogen0;
-		
-		
-		s0 temp;
-	for(int j=0;j<helium0.size()-1;j++)
-	{
-		System.out.println("j: "+j);
-		for(int i=0;i<helium0.size()-j;i++)
-		{
-			System.out.println("i: "+i);
-			System.out.println("i: "+i);
+		System.out.println("Before: ");
+		printHeliumLL();
+		printHydrogenLL();
+		qqSortLL(true);
+		qqSortLL(false);	
+		System.out.println("After: ");
 
-		if(helium0.get(i).getHeatStep0()>helium0.get(i+1).getHeatStep0())
-		{
-			temp=(s0)helium0.get(i).clone();
-			helium0.get(i).setContents0(helium0.get(i+1).getTemperature(), helium0.get(i+1).getHeatStep0(), helium0.get(i+1).getHelium());
-			helium0.get(i+1).setContents0(temp.getTemperature(), temp.getHeatStep0(), temp.getHelium());
-		}
+		printHeliumLL();
+		printHydrogenLL();
+		
 		
 	}
+	
+	public void qqSortLL(boolean helium)
+	{
+		if(helium==true)
+		{
+		if(helium0.size()==0 || helium0==null)
+		{
+			System.out.println("Empty or Null.  No need for sorting");
+			return; // No need for sorting
+		}
+		int length=helium0.size();
+		qqSort(0,length-1,helium); //This is the interval in which you want to sort
+		}
+		else
+		{
+			if(hydrogen0.size()==0 || hydrogen0==null)
+			{
+				System.out.println("Empty or Null.  No need for sorting");
+				return; // No need for sorting
+			}
+			int length=hydrogen0.size();
+			qqSort(0,length-1,helium); //This is the interval in which you want to sort
+		}
 	}
+	
+	
+	 public void swapPos(int position1, int position2, boolean helium)
+		{
+		 	if(helium)
+		 	{
+			s0 copy1= helium0.get(position1);
+			s0 copy2= helium0.get(position2);
+			helium0.set(position2, copy1);
+			helium0.set(position1, copy2);
+		 	}
+		 	else{
+		 		s0 copy1= hydrogen0.get(position1);
+				s0 copy2= hydrogen0.get(position2);
+				hydrogen0.set(position2, copy1);
+				hydrogen0.set(position1, copy2);
+		 	}
+
+			// The objective of this function is to swap LL
+		}
+	private void qqSort(int lowerIndex, int higherIndex,boolean helium)
+	{
+		if(helium==true)
+		{
+		int i=lowerIndex;
+		int j=higherIndex;
+		s0 pivot=helium0.get(lowerIndex+(higherIndex-lowerIndex)/2);  // This is your pivot LL.
+		System.out.println(" Pivot: "+pivot.toString());
+		while (i<=j)
+		{
+			while(helium0.get(i).getTemperature()<pivot.getTemperature())
+			{
+				i++;
+			}
+			while(helium0.get(j).getTemperature()>pivot.getTemperature())
+			{
+				j--;
+			}
+			if(i<=j)
+			{
+				swapPos(i,j,helium);
+				i++;
+				j--;
+				
+			}
+		}
+		if (lowerIndex < j)
+		{
+			qqSort(lowerIndex, j,helium);
+		}
+        if (i < higherIndex)
+        {
+        	qqSort(i, higherIndex,helium);
+        }
+		}
+		else
+		{
+			int i=lowerIndex;
+			int j=higherIndex;
+			s0 pivot=hydrogen0.get(lowerIndex+(higherIndex-lowerIndex)/2);  // This is your pivot LL.
+			System.out.println(" Pivot: "+pivot.toString());
+
+			while (i<=j)
+			{
+				while(hydrogen0.get(i).getTemperature()<pivot.getTemperature())
+				{
+					i++;
+				}
+				while(hydrogen0.get(j).getTemperature()>pivot.getTemperature())
+				{
+					j--;
+				}
+				if(i<=j)
+				{
+					swapPos(i,j,helium);
+					i++;
+					j--;
+					
+				}
+			}
+			if (lowerIndex < j)
+			{
+				qqSort(lowerIndex, j,helium);
+			}
+	        if (i < higherIndex)
+	        {
+	        	qqSort(i, higherIndex,helium);
+	        }
+		}
 	}
+	
 	
 	
 	public void printHeliumLL()

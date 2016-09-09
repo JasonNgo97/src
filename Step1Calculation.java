@@ -13,6 +13,7 @@ public class Step1Calculation
 	private int beginIndex;
 	private int endIndex;
 	
+	
 	public boolean testEmpty()
 	{
 		if(Step1Calc.size()==0)

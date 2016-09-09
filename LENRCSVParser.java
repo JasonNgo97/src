@@ -60,6 +60,7 @@ public class LENRCSVParser
     static private ArrayList<Double> PowOut;
 
     static private Stack<Step1Calculation> Step1Calc;
+    static private Step1Calculation pastCalc;
     static private Stack<Step2and3Calc> Step2Calc;
     static private LinkedList<Step1Calculation> Step1LongCalc;
     static private Step2and3Calc tableCalc;
@@ -1012,7 +1013,7 @@ public class LENRCSVParser
     	System.out.println(" Inside Step 4");
     	int timesDetected=0;
     	boolean foundStep4=false;
-    	int calibrationPressureHydrogen=600;
+    	int calibrationPressureHydrogen=500;
     	int QPulsePowerStart=5;
     	int beginIndex=-1;
     	String endTime, holderIndex,holderTime;
@@ -1205,6 +1206,11 @@ public class LENRCSVParser
     //These are used for the testing of both queues
     public void calculateStep2and3Intervals(Step1Calculation past)
     {
+    	if(past==null )
+    	{
+    		pastCalc=null;
+    		return ;
+    	}
     	System.out.println("Calculating Step 2 and 3 now***");
     	//System.out.println("Step 1 LONG SIZE: "+Step1LongCalc.size());
         double mean=0;
@@ -1250,6 +1256,7 @@ public class LENRCSVParser
 
         	//Use the past number
         	tableCalc= new Step2and3Calc(past.getMean());
+        	pastCalc=past;
             tableCalc.setDate(time.get(0));
 
         	for( int i=0;i<Step2Short.size();i++)

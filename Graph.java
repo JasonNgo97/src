@@ -783,6 +783,9 @@ public class Graph extends JPanel
 	{
 		LENRCSVParser parse= new LENRCSVParser(date,step0);
 		this.table4=null;
+		if(step1Calibration!=null)
+			
+		{
 		if(parse.detectStep4Intervals()==true)
 		{
 			System.out.println("Step 4 works");
@@ -795,7 +798,7 @@ public class Graph extends JPanel
 		{
 			System.out.println(" Step 4 is not here");
 		}
-		
+		}
 		if(pointToPlot.size()>0)
 		{
 			pointToPlot.clear();
@@ -1126,6 +1129,12 @@ public class Graph extends JPanel
 	
 	public void initializeStep2Points(LENRCSVParser parse, Step1Calculation past, Point origin)
 	{
+		if(past==null)
+		{
+			return;
+		}
+		
+		
 		LinkedList<Integer> pulseRange=	parse.getPulseRange();
 		
 		
